@@ -32,11 +32,12 @@
   [_ ^RestClientBuilder builder f]
   (-> builder (.setRequestConfigCallback (request-config-callback f))))
 
-(defmethod set-option! :sniff-on-failure?
-  [_ ^RestClientBuilder builder sniff-on-failure?]
-  (if sniff-on-failure?
-    (set-option! :failure-listener builder (SniffOnFailureListener.))
-    builder))
+(defmethod set-option! :sniff-on-failure
+  [_ ^RestClientBuilder builder sniffer]
+  (let [listener (SniffOnFailureListener.)]
+    (set-option! :failure-listener builder listener)
+    (.setSniffer listener sniffer))
+  builder)
 
 (defmethod set-option! :failure-listener
   [_ ^RestClientBuilder builder failure-listener]
