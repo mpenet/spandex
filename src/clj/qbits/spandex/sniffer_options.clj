@@ -2,9 +2,7 @@
   (:import
    (org.elasticsearch.client.sniff
     SnifferBuilder
-    Sniffer
-    ElasticsearchHostsSniffer
-    ElasticsearchHostsSniffer$Scheme)))
+    Sniffer)))
 
 (defmulti set-option! (fn [k builder option] k))
 
@@ -15,6 +13,10 @@
 (defmethod set-option! :sniff-interval
   [_ ^SnifferBuilder builder interval]
   (-> builder (.setSniffIntervalMillis (int interval))))
+
+(defmethod set-option! :sniff-after-failure-interval
+  [_ ^SnifferBuilder builder interval]
+  (-> builder (.setSniffAfterFailureDelayMillis (int interval))))
 
 (defmethod set-option! :default
   [_ ^SnifferBuilder b x]

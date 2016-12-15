@@ -5,9 +5,8 @@
     RestClient
     RestClientBuilder
     RestClientBuilder$RequestConfigCallback
-    RestClientBuilder$HttpClientConfigCallback)))
-
-(clojure.pprint/pprint (bean RestClientBuilder$RequestConfigCallback))
+    RestClientBuilder$HttpClientConfigCallback)
+   (org.elasticsearch.client.sniff SniffOnFailureListener)))
 
 (defn request-config-callback [f]
   (reify RestClientBuilder$RequestConfigCallback
@@ -32,6 +31,16 @@
 (defmethod set-option! :request-config-callback
   [_ ^RestClientBuilder builder f]
   (-> builder (.setRequestConfigCallback (request-config-callback f))))
+
+(defmethod set-option! :sniff-on-failure?
+  [_ ^RestClientBuilder builder sniff-on-failure?]
+  (if sniff-on-failure?
+    (set-option! :failure-listener builder (SniffOnFailureListener.))
+    builder))
+
+(defmethod set-option! :failure-listener
+  [_ ^RestClientBuilder builder failure-listener]
+  (-> builder (.setFailureListener failure-listener)))
 
 (defmethod set-option! :default
   [_ ^RestClientBuilder b x]
