@@ -12,7 +12,6 @@
     Sniffer
     ElasticsearchHostsSniffer
     ElasticsearchHostsSniffer$Scheme)
-
    (org.elasticsearch.client
     RestClient
     Response

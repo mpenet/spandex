@@ -10,10 +10,6 @@
   [_ ^SnifferBuilder builder interval]
   (-> builder (.setSniffIntervalMillis (int interval))))
 
-(defmethod set-option! :sniff-interval
-  [_ ^SnifferBuilder builder interval]
-  (-> builder (.setSniffIntervalMillis (int interval))))
-
 (defmethod set-option! :sniff-after-failure-interval
   [_ ^SnifferBuilder builder interval]
   (-> builder (.setSniffAfterFailureDelayMillis (int interval))))
@@ -30,8 +26,7 @@
           options))
 
 (defn builder [client sniffer options]
-  (let [b (Sniffer/builder client)]
-    (-> b
-        (.setHostsSniffer sniffer)
-        (set-options! options)
-        .build)))
+  (-> (Sniffer/builder client)
+      (.setHostsSniffer sniffer)
+      (set-options! options)
+      .build))

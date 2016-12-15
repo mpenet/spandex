@@ -1,12 +1,14 @@
 (ns qbits.spandex.client-options
   (:import
-   (org.apache.http HttpHost)
+   (org.apache.http
+    HttpHost)
    (org.elasticsearch.client
     RestClient
     RestClientBuilder
     RestClientBuilder$RequestConfigCallback
     RestClientBuilder$HttpClientConfigCallback)
-   (org.elasticsearch.client.sniff SniffOnFailureListener)))
+   (org.elasticsearch.client.sniff
+    SniffOnFailureListener)))
 
 (defn request-config-callback [f]
   (reify RestClientBuilder$RequestConfigCallback
