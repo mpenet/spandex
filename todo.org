@@ -1,3 +1,7 @@
+# spandex todo
+
+## Major
+
 * TODO start test suite
 * TODO clj.specs
 * TODO add all client/sniffer options
