@@ -41,10 +41,9 @@
             :keys [scheme timeout]
             :or {scheme :http
                  timeout ElasticsearchHostsSniffer/DEFAULT_SNIFF_REQUEST_TIMEOUT}}]
-   (let [sniffer (ElasticsearchHostsSniffer.
-                  client
-                  timeout
-                  (sniffer-scheme scheme))]
+   (let [sniffer (ElasticsearchHostsSniffer. client
+                                             timeout
+                                             (sniffer-scheme scheme))]
      (sniffer-options/builder client sniffer options))))
 
 (defprotocol BodyEncoder
