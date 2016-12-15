@@ -9,10 +9,10 @@ Elasticsearch rest client wrapper (wip)
 
 (require '[qbits.spandex :as s])
 
-(def c (s/client ["http://127.0.0.1:9200" "http://foo2:3838"]))
+(def c (s/client ["http://127.0.0.1:9200" "http://foo2:3838"] {... options ...}))
 
 ;; add optional sniffer
-(def s (s/sniffer c))
+(def s (s/sniffer c {... options ...}))
 
 
 ;; blocking
