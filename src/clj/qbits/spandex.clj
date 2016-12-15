@@ -1,10 +1,17 @@
 (ns qbits.spandex
   (:require
-   [qbits.spandex.options :as options]
+   [qbits.spandex.client-options :as client-options]
+   [qbits.spandex.sniffer-options :as sniffer-options]
+   [qbits.commons.enum :as enum]
    [cheshire.core :as json]
    [clojure.string :as str]
    [clojure.java.io :as io])
   (:import
+   (org.elasticsearch.client.sniff
+    Sniffer
+    ElasticsearchHostsSniffer
+    ElasticsearchHostsSniffer$Scheme)
+
    (org.elasticsearch.client
     RestClient
     Response
@@ -20,7 +27,22 @@
   ([hosts]
    (client hosts {}))
   ([hosts options]
-  (options/builder hosts options)))
+   (options/builder hosts options)))
+
+(def sniffer-scheme (enum/enum->fn ElasticsearchHostsSniffer$Scheme))
+
+(defn sniffer
+  ([client]
+   (sniffer client nil))
+  ([client {:as options
+            :keys [scheme timeout]
+            :or {scheme :http
+                 timeout ElasticsearchHostsSniffer/DEFAULT_SNIFF_REQUEST_TIMEOUT}}]
+   (let [sniffer (ElasticsearchHostsSniffer.
+                  client
+                  timeout
+                  (sniffer-scheme scheme))]
+     (sniffer-options/builder client sniffer options))))
 
 (defprotocol BodyEncoder
   (encode-body [x]))
