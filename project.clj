@@ -7,7 +7,8 @@
                  [org.clojure/core.async "0.2.395"]
                  [org.elasticsearch.client/rest "5.1.1"]
                  [org.elasticsearch.client/sniffer "5.1.1"]
-                 [cc.qbits/commons "0.4.6"]]
+                 [cc.qbits/commons "0.4.6"]
+                 [cheshire "5.6.3"]]
   :codox {:src-dir-uri "https://github.com/mpenet/spandex/blob/master/"
           :src-linenum-anchor-prefix "L"
           :defaults {:doc/format :markdown}

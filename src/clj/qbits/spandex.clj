@@ -1,10 +1,14 @@
 (ns qbits.spandex
   (:require
-   [qbits.spandex.options :as options])
+   [qbits.spandex.options :as options]
+   [cheshire.core :as json]
+   [clojure.string :as str])
   (:import
-   (org.elasticsearch.client HttpAsyncResponseConsumerFactory)
-   (org.elasticsearch.client ResponseListener)
-   (org.elasticsearch.client RestClient)
+   (org.elasticsearch.client
+    RestClient
+    Response
+    HttpAsyncResponseConsumerFactory
+    ResponseListener)
    (org.apache.http Header)
    (org.apache.http.message BasicHeader)
    (org.apache.http.entity
@@ -17,16 +21,21 @@
   ([hosts options]
   (options/builder hosts options)))
 
-(defprotocol BodyEncodable
+(defprotocol BodyEncoder
   (encode-body [x]))
 
-(extend-protocol BodyEncodable
+(extend-protocol BodyEncoder
   String
   (encode-body [x]
     (StringEntity. x))
   java.io.InputStream
   (encode-body [x]
-    (InputStreamEntity. x)))
+    (InputStreamEntity. x))
+  nil
+  (encode-body [x] nil))
+
+(defprotocol BodyDecoder
+  (decode-body [x] x))
 
 (defn encode-headers
   [headers]
@@ -40,35 +49,69 @@
              {}
              qs))
 
+(defn response-decoder
+  [^Response response]
+  (let [entity  (.getEntity response)
+        json? (-> entity .getContentType .getValue (str/index-of "application/json") (> -1))
+        content (.getContent entity)]
+    {:body (if json?
+             (-> content
+                 clojure.java.io/reader
+                 (json/parse-stream true))
+             (slurp content))
+     :status (some-> response .getStatusLine .getStatusCode)
+     :headers (->> response .getHeaders
+                   (reduce (fn [m ^Header h]
+                             (assoc! m
+                                     (.getName h)
+                                     (.getValue h)))
+                           (transient {}))
+                   persistent!)
+     :host (.getHost response)}))
+
 (defn response-listener [success error]
   (reify ResponseListener
     (onSuccess [this response]
-      (when success (success response)))
+      (when success (success (response-decoder response))))
     (onFailure [this ex]
       (when error (error ex)))))
 
-(defn request [^RestClient client
-               {:keys [method url headers query-string body]
-                :as request-params}]
-  (.performRequest client
-                   (name method)
-                   url
-                   (encode-query-string query-string)
-                   (encode-body body)
-                   (encode-headers headers)))
+(defn request
+  [^RestClient client {:keys [method url headers query-string body]
+                       :or {method :get}
+                       :as request-params}]
+  (-> client
+      (.performRequest
+       (name method)
+       url
+       (encode-query-string query-string)
+       (encode-body body)
+       (encode-headers headers))
+      response-decoder))
 
 (defn request-async [^RestClient client
                      {:keys [method url headers query-string body
                              success error
                              response-consumer-factory]
-                      :as request-params}
-                     handler]
-  (.performRequestAsync client
-                        (name method)
-                        url
-                        (encode-query-string query-string)
-                        (encode-body body)
-                        (or response-consumer-factory
-                            HttpAsyncResponseConsumerFactory/DEFAULT)
-                        (response-listener success error)
-                        (encode-headers headers)))
+                      :or {method :get}
+                      :as request-params}]
+  ;; eeek
+  (if response-consumer-factory
+    (.performRequestAsync client
+                          (name method)
+                          url
+                          (encode-query-string query-string)
+                          (encode-body body)
+                          response-consumer-factory
+                          (response-listener success error)
+                          (encode-headers headers))
+    (.performRequestAsync client
+                          (name method)
+                          url
+                          (encode-query-string query-string)
+                          (encode-body body)
+                          (response-listener success error)
+                          (encode-headers headers))))
+
+;; (def x (client ["http://localhost:9200/asdf"]))
+;; (request-async x {:url "" :success (fn [x] (prn x)) :error (fn [x] (prn :err x))} )
