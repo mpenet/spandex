@@ -46,6 +46,15 @@
                                              (sniffer-scheme scheme))]
      (sniffer-options/builder client sniffer options))))
 
+(defprotocol Closable
+  (close! [this]))
+
+(extend-protocol Closable
+  Sniffer
+  (close! [sniffer] (.close sniffer))
+  RestClient
+  (close! [client] (.close client)))
+
 (defprotocol BodyEncoder
   (encode-body [x]))
 
