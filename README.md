@@ -1,9 +1,8 @@
 # spandex
 
-Elasticsearch rest client wrapper (wip)
+Elasticsearch (fast) [rest client](https://www.elastic.co/blog/benchmarking-rest-client-transport-client) wrapper (wip)
 
 **here be dragons**
-
 
 ``` clojure
 
