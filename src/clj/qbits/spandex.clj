@@ -20,7 +20,8 @@
    (org.apache.http
     Header
     HttpEntity)
-   (org.apache.http.message BasicHeader)
+   (org.apache.http.message
+    BasicHeader)
    (org.apache.http.entity
     StringEntity
     InputStreamEntity)))
@@ -169,5 +170,6 @@
     ch))
 
 ;; (def x (client ["http://localhost:9200"]))
+;; (def s (sniffer x))
 ;; (request x {:url "/entries/entry" :method :post :body {:foo "bar"}} )
 ;; (async/<!! (request-ch x {:url "/entries/entry" :method :post :body {:foo "bar"}} ))

@@ -1,0 +1,5 @@
+* TODO start test suite
+* TODO clj.specs
+* TODO add all client/sniffer options
+* TODO impl auth providers - https://www.elastic.co/guide/en/elasticsearch/client/java-rest/current/_basic_authentication.html
+* TODO encryption - https://www.elastic.co/guide/en/elasticsearch/client/java-rest/current/_encrypted_communication.html
