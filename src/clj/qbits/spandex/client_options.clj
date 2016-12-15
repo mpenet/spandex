@@ -13,12 +13,12 @@
 (defn request-config-callback [f]
   (reify RestClientBuilder$RequestConfigCallback
     (customizeRequestConfig [this builder]
-      (f))))
+      (f b))))
 
 (defn request-http-client-config-callback [f]
   (reify RestClientBuilder$HttpClientConfigCallback
     (customizeHttpClient [this builder]
-      (f))))
+      (f b))))
 
 (defmulti set-option! (fn [k builder option] k))
 
