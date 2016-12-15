@@ -18,7 +18,9 @@
     Response
     HttpAsyncResponseConsumerFactory
     ResponseListener)
-   (org.apache.http Header)
+   (org.apache.http
+    Header
+    HttpEntity)
    (org.apache.http.message BasicHeader)
    (org.apache.http.entity
     StringEntity
@@ -70,29 +72,44 @@
                      (BasicHeader. (name k) v))
                    headers)))
 
-(defn encode-query-string [qs]
+(defn response-headers
+  [^Response response]
+  (->> response
+      .getHeaders
+      (reduce (fn [m ^Header h]
+                (assoc! m
+                        (.getName h)
+                        (.getValue h)))
+              (transient {}))
+      persistent!))
+
+(defn encode-query-string
+  [qs]
   (reduce-kv (fn [m k v] (assoc m (name k) v))
              {}
              qs))
 
+(defn json-entity?
+  [^HttpEntity entity]
+  (-> entity
+      .getContentType
+      .getValue
+      (str/index-of "application/json")
+      (> -1)))
+
+(defn response-status
+  [^Response response]
+  (some-> response .getStatusLine .getStatusCode))
+
 (defn response-decoder
   [^Response response]
   (let [entity  (.getEntity response)
-        json? (-> entity .getContentType .getValue (str/index-of "application/json") (> -1))
         content (.getContent entity)]
-    {:body (if json?
-             (-> content
-                 io/reader
-                 (json/parse-stream true))
+    {:body (if (json-entity? entity)
+             (-> content io/reader (json/parse-stream true))
              (slurp content))
-     :status (some-> response .getStatusLine .getStatusCode)
-     :headers (->> response .getHeaders
-                   (reduce (fn [m ^Header h]
-                             (assoc! m
-                                     (.getName h)
-                                     (.getValue h)))
-                           (transient {}))
-                   persistent!)
+     :status (response-status response)
+     :headers (response-headers response)
      :host (.getHost response)}))
 
 (defn response-listener [success error]
