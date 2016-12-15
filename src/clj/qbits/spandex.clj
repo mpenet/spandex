@@ -2,7 +2,8 @@
   (:require
    [qbits.spandex.options :as options]
    [cheshire.core :as json]
-   [clojure.string :as str])
+   [clojure.string :as str]
+   [clojure.java.io :as io])
   (:import
    (org.elasticsearch.client
     RestClient
@@ -25,12 +26,14 @@
   (encode-body [x]))
 
 (extend-protocol BodyEncoder
-  String
-  (encode-body [x]
-    (StringEntity. x))
   java.io.InputStream
   (encode-body [x]
-    (InputStreamEntity. x))
+    (InputStreamEntity. (json/generate-stream (io/writer x))))
+
+  Object
+  (encode-body [x]
+    (StringEntity. (json/generate-string x)))
+
   nil
   (encode-body [x] nil))
 
@@ -56,7 +59,7 @@
         content (.getContent entity)]
     {:body (if json?
              (-> content
-                 clojure.java.io/reader
+                 io/reader
                  (json/parse-stream true))
              (slurp content))
      :status (some-> response .getStatusLine .getStatusCode)
@@ -95,7 +98,7 @@
                              response-consumer-factory]
                       :or {method :get}
                       :as request-params}]
-  ;; eeek
+  ;; eeek we can prolly avoid duplication here
   (if response-consumer-factory
     (.performRequestAsync client
                           (name method)
@@ -114,4 +117,4 @@
                           (encode-headers headers))))
 
 ;; (def x (client ["http://localhost:9200/asdf"]))
-;; (request-async x {:url "" :success (fn [x] (prn x)) :error (fn [x] (prn :err x))} )
+;; (request x {:url "/entries/entry" :method :post :body {:foo "bar"}} )
