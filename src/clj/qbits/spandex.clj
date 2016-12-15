@@ -1,5 +1,6 @@
 (ns qbits.spandex
   (:require
+   [clojure.core.async :as async]
    [qbits.spandex.client-options :as client-options]
    [qbits.spandex.sniffer-options :as sniffer-options]
    [qbits.commons.enum :as enum]
@@ -27,7 +28,7 @@
   ([hosts]
    (client hosts {}))
   ([hosts options]
-   (options/builder hosts options)))
+   (client-options/builder hosts options)))
 
 (def sniffer-scheme (enum/enum->fn ElasticsearchHostsSniffer$Scheme))
 
@@ -114,12 +115,13 @@
        (encode-headers headers))
       response-decoder))
 
-(defn request-async [^RestClient client
-                     {:keys [method url headers query-string body
-                             success error
-                             response-consumer-factory]
-                      :or {method :get}
-                      :as request-params}]
+(defn request-async
+  [^RestClient client
+   {:keys [method url headers query-string body
+           success error
+           response-consumer-factory]
+    :or {method :get}
+    :as request-params}]
   ;; eeek we can prolly avoid duplication here
   (if response-consumer-factory
     (.performRequestAsync client
@@ -138,5 +140,18 @@
                           (response-listener success error)
                           (encode-headers headers))))
 
-;; (def x (client ["http://localhost:9200/asdf"]))
+(defn request-ch
+  [^RestClient client options]
+  (let [ch (async/promise-chan)]
+    (try
+      (request-async client
+                     (assoc options
+                            :success (fn [response] (async/put! ch response))
+                            :error (fn [ex] (async/put! ch ex))))
+      (catch Throwable t
+        (async/put! ch t)))
+    ch))
+
+;; (def x (client ["http://localhost:9200"]))
 ;; (request x {:url "/entries/entry" :method :post :body {:foo "bar"}} )
+;; (async/<!! (request-ch x {:url "/entries/entry" :method :post :body {:foo "bar"}} ))
