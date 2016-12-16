@@ -1,6 +1,6 @@
 # spandex
 
-Elasticsearch (fast) [rest client](https://www.elastic.co/blog/benchmarking-rest-client-transport-client) wrapper (wip)
+Elasticsearch (fast) [rest-client](https://www.elastic.co/guide/en/elasticsearch/client/java-rest/current/java-rest.html) ([official benchmark](https://www.elastic.co/blog/benchmarking-rest-client-transport-client)) wrapper (wip)
 
 **here be dragons**
 

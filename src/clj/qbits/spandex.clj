@@ -8,14 +8,13 @@
    [clojure.string :as str]
    [clojure.java.io :as io])
   (:import
-   (org.elasticsearch.client.sniff
-    Sniffer
-    ElasticsearchHostsSniffer
-    ElasticsearchHostsSniffer$Scheme)
+    (org.elasticsearch.client.sniff
+      Sniffer
+      ElasticsearchHostsSniffer
+      ElasticsearchHostsSniffer$Scheme SniffOnFailureListener)
    (org.elasticsearch.client
     RestClient
     Response
-    HttpAsyncResponseConsumerFactory
     ResponseListener)
    (org.apache.http
     Header
@@ -45,6 +44,12 @@
                                              timeout
                                              (sniffer-scheme scheme))]
      (sniffer-options/builder client sniffer options))))
+
+(defn sniff-on-failure
+  "Register a SniffOnFailureListener that allows to perform sniffing on failure."
+  [^Sniffer sniffer]
+  (doto (SniffOnFailureListener.)
+    (.setSniffer sniffer)))
 
 (defprotocol Closable
   (close! [this]))
