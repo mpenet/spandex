@@ -8,10 +8,10 @@
    [clojure.string :as str]
    [clojure.java.io :as io])
   (:import
-    (org.elasticsearch.client.sniff
-      Sniffer
-      ElasticsearchHostsSniffer
-      ElasticsearchHostsSniffer$Scheme SniffOnFailureListener)
+   (org.elasticsearch.client.sniff
+    Sniffer
+    ElasticsearchHostsSniffer
+    ElasticsearchHostsSniffer$Scheme SniffOnFailureListener)
    (org.elasticsearch.client
     RestClient
     Response
@@ -88,13 +88,13 @@
 (defn response-headers
   [^Response response]
   (->> response
-      .getHeaders
-      (reduce (fn [m ^Header h]
-                (assoc! m
-                        (.getName h)
-                        (.getValue h)))
-              (transient {}))
-      persistent!))
+       .getHeaders
+       (reduce (fn [m ^Header h]
+                 (assoc! m
+                         (.getName h)
+                         (.getValue h)))
+               (transient {}))
+       persistent!))
 
 (defn encode-query-string
   [qs]

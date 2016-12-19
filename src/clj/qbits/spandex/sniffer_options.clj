@@ -1,8 +1,8 @@
 (ns qbits.spandex.sniffer-options
   (:import
-    (org.elasticsearch.client.sniff
-      SnifferBuilder
-      Sniffer)))
+   (org.elasticsearch.client.sniff
+    SnifferBuilder
+    Sniffer)))
 
 (defmulti set-option! (fn [k builder option] k))
 
