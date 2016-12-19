@@ -11,7 +11,8 @@
    (org.elasticsearch.client.sniff
     Sniffer
     ElasticsearchHostsSniffer
-    ElasticsearchHostsSniffer$Scheme SniffOnFailureListener)
+    ElasticsearchHostsSniffer$Scheme
+    SniffOnFailureListener)
    (org.elasticsearch.client
     RestClient
     Response
