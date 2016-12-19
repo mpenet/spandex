@@ -10,4 +10,5 @@
                  [cc.qbits/commons "0.4.6"]
                  [cheshire "5.6.3"]]
   :source-paths ["src/clj"]
-  :global-vars {*warn-on-reflection* true})
+  :global-vars {*warn-on-reflection* true}
+  :plugins [[lein-cljfmt "0.5.6"]])
