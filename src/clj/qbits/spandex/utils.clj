@@ -5,7 +5,7 @@
 (defprotocol URLFragment
   (encode [value]))
 
-(defn string-builder
+(defn ^:no-doc string-builder
   ([] (StringBuilder.))
   ([^StringBuilder sb x] (.append sb x))
   ([^StringBuilder sb] (.toString sb)))
@@ -25,7 +25,7 @@
   Object
   (encode [value] value))
 
-(def comma-sep+encoded-xform
+(def ^:no-doc comma-sep+encoded-xform
   (comp (remove nil?)
         (map encode)
         (interpose ",")))

@@ -10,17 +10,17 @@
    (org.elasticsearch.client.sniff
     SniffOnFailureListener)))
 
-(defn request-config-callback [f]
+(defn ^:no-doc request-config-callback [f]
   (reify RestClientBuilder$RequestConfigCallback
     (customizeRequestConfig [this builder]
       (f builder))))
 
-(defn request-http-client-config-callback [f]
+(defn ^:no-doc request-http-client-config-callback [f]
   (reify RestClientBuilder$HttpClientConfigCallback
     (customizeHttpClient [this builder]
       (f builder))))
 
-(defmulti set-option! (fn [k builder option] k))
+(defmulti ^:no-doc set-option! (fn [k builder option] k))
 
 (defmethod set-option! :max-retry-timeout
   [_ ^RestClientBuilder builder timeout-ms]
@@ -49,7 +49,7 @@
   [_ ^RestClientBuilder b x]
   b)
 
-(defn set-options!
+(defn ^:no-doc set-options!
   [^RestClientBuilder builder options]
   (reduce (fn [builder [k option]]
             (set-option! k builder option))

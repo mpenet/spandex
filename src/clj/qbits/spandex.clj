@@ -32,7 +32,7 @@
   ([hosts options]
    (client-options/builder hosts options)))
 
-(def sniffer-scheme (enum/enum->fn ElasticsearchHostsSniffer$Scheme))
+(def ^:no-doc sniffer-scheme (enum/enum->fn ElasticsearchHostsSniffer$Scheme))
 
 (defn sniffer
   "Takes a Client instance (and possible sniffer options) and returns
@@ -88,17 +88,17 @@
   nil
   (encode-body [x] nil))
 
-(defprotocol BodyDecoder
-  (decode-body [x] x))
+(defprotocol ^:no-doc BodyDecoder
+  (decode-body [x]))
 
-(defn encode-headers
+(defn ^:no-doc encode-headers
   [headers]
   (into-array Header
               (map (fn [[k v]]
                      (BasicHeader. (name k) v))
                    headers)))
 
-(defn response-headers
+(defn ^:no-doc response-headers
   [^org.elasticsearch.client.Response response]
   (->> response
        .getHeaders
@@ -109,13 +109,13 @@
                (transient {}))
        persistent!))
 
-(defn encode-query-string
+(defn ^:no-doc encode-query-string
   [qs]
   (reduce-kv (fn [m k v] (assoc m (name k) v))
              {}
              qs))
 
-(defn json-entity?
+(defn ^:no-doc json-entity?
   [^HttpEntity entity]
   (-> entity
       .getContentType
@@ -123,13 +123,13 @@
       (str/index-of "application/json")
       (> -1)))
 
-(defn response-status
+(defn ^:no-doc response-status
   [^org.elasticsearch.client.Response response]
   (some-> response .getStatusLine .getStatusCode))
 
 (defrecord Response [body status headers hosts])
 
-(defn response-decoder
+(defn ^:no-doc response-decoder
   [^org.elasticsearch.client.Response response]
   (let [entity  (.getEntity response)
         content (.getContent entity)]
@@ -140,7 +140,8 @@
                (response-headers response)
                (.getHost response))))
 
-(defn response-listener [success error]
+(defn ^:no-doc response-listener
+  [success error]
   (reify ResponseListener
     (onSuccess [this response]
       (when success (success (response-decoder response))))

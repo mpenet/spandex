@@ -4,7 +4,7 @@
     SnifferBuilder
     Sniffer)))
 
-(defmulti set-option! (fn [k builder option] k))
+(defmulti ^:no-doc set-option! (fn [k builder option] k))
 
 (defmethod set-option! :sniff-interval
   [_ ^SnifferBuilder builder interval]
@@ -18,7 +18,7 @@
   [_ ^SnifferBuilder b x]
   b)
 
-(defn ^SnifferBuilder set-options!
+(defn ^:no-doc set-options! ^SnifferBuilder
   [^SnifferBuilder builder options]
   (reduce (fn [builder [k option]]
             (set-option! k builder option))
