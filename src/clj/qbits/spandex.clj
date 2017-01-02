@@ -15,7 +15,6 @@
     SniffOnFailureListener)
    (org.elasticsearch.client
     RestClient
-    Response
     ResponseListener)
    (org.apache.http
     Header
@@ -27,6 +26,7 @@
     InputStreamEntity)))
 
 (defn client
+  "Returns a client instance to be used to perform requests"
   ([hosts]
    (client hosts {}))
   ([hosts options]
@@ -35,6 +35,8 @@
 (def sniffer-scheme (enum/enum->fn ElasticsearchHostsSniffer$Scheme))
 
 (defn sniffer
+  "Takes a Client instance (and possible sniffer options) and returns
+  a sniffer instance that will initially be bound to passed client."
   ([client]
    (sniffer client nil))
   ([client {:as options
@@ -46,8 +48,9 @@
                                              (sniffer-scheme scheme))]
      (sniffer-options/builder client sniffer options))))
 
-(defn sniff-on-failure
-  "Register a SniffOnFailureListener that allows to perform sniffing on failure."
+(defn set-sniff-on-failure!
+  "Register a SniffOnFailureListener that allows to perform sniffing
+  on failure."
   [^Sniffer sniffer]
   (doto (SniffOnFailureListener.)
     (.setSniffer sniffer)))
@@ -61,6 +64,12 @@
   RestClient
   (close! [client] (.close client)))
 
+(defrecord Raw [value])
+(defn raw
+  "Marks body as raw, which allows to skip JSON encoding"
+  [body]
+  (Raw. body))
+
 (defprotocol BodyEncoder
   (encode-body [x]))
 
@@ -72,6 +81,9 @@
   Object
   (encode-body [x]
     (StringEntity. (json/generate-string x)))
+
+  Raw
+  (encode-body [x] x)
 
   nil
   (encode-body [x] nil))
@@ -87,7 +99,7 @@
                    headers)))
 
 (defn response-headers
-  [^Response response]
+  [^org.elasticsearch.client.Response response]
   (->> response
        .getHeaders
        (reduce (fn [m ^Header h]
@@ -112,19 +124,21 @@
       (> -1)))
 
 (defn response-status
-  [^Response response]
+  [^org.elasticsearch.client.Response response]
   (some-> response .getStatusLine .getStatusCode))
 
+(defrecord Response [body status headers hosts])
+
 (defn response-decoder
-  [^Response response]
+  [^org.elasticsearch.client.Response response]
   (let [entity  (.getEntity response)
         content (.getContent entity)]
-    {:body (if (json-entity? entity)
-             (-> content io/reader (json/parse-stream true))
-             (slurp content))
-     :status (response-status response)
-     :headers (response-headers response)
-     :host (.getHost response)}))
+    (Response. (if (json-entity? entity)
+                 (-> content io/reader (json/parse-stream true))
+                 (slurp content))
+               (response-status response)
+               (response-headers response)
+               (.getHost response))))
 
 (defn response-listener [success error]
   (reify ResponseListener
@@ -183,7 +197,21 @@
         (async/put! ch t)))
     ch))
 
+(def bulk->body
+  "Utility function to create _bulk bodies. It takes a sequence of clj
+  maps representing _bulk document fragments and returns a newline
+  delimited string of JSON fragments"
+  (let [xform (map json/generate-string)
+        tf (fn
+             ([] (StringBuilder.))
+             ([^StringBuilder sb x]
+              (.append sb x)
+              (.append sb "\n"))
+             ([^StringBuilder sb] (.toString sb)))]
+    (fn [fragments]
+      (Raw. (transduce xform tf fragments)))))
+
 ;; (def x (client ["http://localhost:9200"]))
 ;; (def s (sniffer x))
-;; (request x {:url "/entries/entry" :method :post :body {:foo "bar"}} )
+;; (request x {:url "entries/entry/_search" :method :get :body {}} )
 ;; (async/<!! (request-ch x {:url "/entries/entry" :method :post :body {:foo "bar"}} ))

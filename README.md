@@ -2,6 +2,24 @@
 
 Elasticsearch (fast) [rest-client](https://www.elastic.co/guide/en/elasticsearch/client/java-rest/current/java-rest.html) ([official benchmark](https://www.elastic.co/blog/benchmarking-rest-client-transport-client)) wrapper (wip)
 
+## Goals
+
+* Be very minimal and performant
+
+* RING inspired
+
+* All "exotic" features should be optional
+
+* Not a giant DSL over another DSL (ESes), just maps everywhere
+
+* Provide minimal (and totally optional) utils to do the boring stuff
+  (bulk, compose urls)
+
+* Can do async via simple callbacks based api or `core.async`
+
+* Provide clj.specs
+
+
 **here be dragons**
 
 ``` clojure
