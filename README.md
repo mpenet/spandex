@@ -17,8 +17,8 @@ See ["Benchmarking REST client and transport client "](https://www.elastic.co/bl
 
 * All "exotic" features should be optional
 
-* Not a giant DSL over another DSL (ESes), just maps everywhere. Rread
-  ElasticSearch doc -> done, not another layer of indirection)
+* Not a giant DSL over another DSL, just maps everywhere.
+  Read ElasticSearch doc -> done, not another layer of indirection
 
 * Provide minimal (and totally optional) utils to do the boring stuff
   (bulk, compose urls)
