@@ -1,4 +1,4 @@
-(defproject cc.qbits/spandex "0.1.0-SNAPSHOT"
+(defproject cc.qbits/spandex "0.1.0"
   :description ""
   :url "https://github.com/mpenet/spandex"
   :license {:name "Eclipse Public License"
@@ -11,7 +11,7 @@
                  [cheshire "5.6.3"]]
   :source-paths ["src/clj"]
   :global-vars {*warn-on-reflection* true}
-  :codox {;; :source-uri "https://github.com/mpenet/spandex/blob/master/{filepath}#L{line}"
+  :codox {:source-uri "https://github.com/mpenet/spandex/blob/master/{filepath}#L{line}"
           :metadata {:doc/format :markdown}
           :output-path "docs"
           :source-paths ["src/clj"]}
