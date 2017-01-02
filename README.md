@@ -11,20 +11,21 @@ See ["Benchmarking REST client and transport client "](https://www.elastic.co/bl
 
 ## Goals
 
-* Be very minimal and performant
+* Be minimal & performant
 
 * RING inspired
 
 * All "exotic" features should be optional
 
-* Not a giant DSL over another DSL (ESes), just maps everywhere
+* Not a giant DSL over another DSL (ESes), just maps everywhere. Rread
+  ElasticSearch doc -> done, not another layer of indirection)
 
 * Provide minimal (and totally optional) utils to do the boring stuff
   (bulk, compose urls)
 
 * Can do async via simple callbacks based api or `core.async`
 
-* Provide clj.specs
+* Provide [specs](https://github.com/mpenet/spandex/blob/master/src/clj/qbits/spandex/spec.clj)
 
 
 **here be dragons**
@@ -63,7 +64,11 @@ See ["Benchmarking REST client and transport client "](https://www.elastic.co/bl
 
 ## API Docs
 
+It's early days, so for now we have only this
+
 [Codox generated docs](https://mpenet.github.io/spandex/)
+
+and the [clj.specs](https://github.com/mpenet/spandex/blob/master/src/clj/qbits/spandex/spec.clj) if that's your thing:
 
 ## License
 
