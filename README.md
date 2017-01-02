@@ -62,13 +62,14 @@ See ["Benchmarking REST client and transport client "](https://www.elastic.co/bl
 
 ```
 
+## Installation
+
+[![Clojars Project](https://img.shields.io/clojars/v/cc.qbits/spandex.svg)](https://clojars.org/cc.qbits/spandex)
+
 ## API Docs
 
-It's early days, so for now we have only this
-
-[Codox generated docs](https://mpenet.github.io/spandex/)
-
-and the [clj.specs](https://github.com/mpenet/spandex/blob/master/src/clj/qbits/spandex/spec.clj) if that's your thing:
+It's early days, so for now we have only [Codox generated docs](https://mpenet.github.io/spandex/)
+Or the [clj.specs](https://github.com/mpenet/spandex/blob/master/src/clj/qbits/spandex/spec.clj) if that's your thing:
 
 ## License
 
