@@ -54,9 +54,13 @@ Elasticsearch (fast) [rest-client](https://www.elastic.co/guide/en/elasticsearch
 
 ```
 
+## API Docs
+
+[Codox generated docs](https://mpenet.github.io/spandex/)
+
 ## License
 
-Copyright © 2016 [Max Penet](http://twitter.com/mpenet)
+Copyright © 2017 [Max Penet](http://twitter.com/mpenet)
 
 Distributed under the
 [Eclipse Public License](http://www.eclipse.org/legal/epl-v10.html),
