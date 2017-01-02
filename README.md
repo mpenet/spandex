@@ -4,7 +4,7 @@ Elasticsearch new [rest-client](https://www.elastic.co/guide/en/elasticsearch/cl
 
 ## Why?
 
-Because the native client is a bit or a nightmare to deal with (for
+Because the native client is a bit of a nightmare to deal with (for
 many reasons) and the new REST client is quite fast.
 
 See ["Benchmarking REST client and transport client "](https://www.elastic.co/blog/benchmarking-rest-client-transport-client)
