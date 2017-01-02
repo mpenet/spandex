@@ -11,4 +11,8 @@
                  [cheshire "5.6.3"]]
   :source-paths ["src/clj"]
   :global-vars {*warn-on-reflection* true}
-  :plugins [[lein-cljfmt "0.5.6"]])
+  :codox {:source-uri "https://github.com/mpenet/spandex/blob/master/{filepath}#L{line}"
+          :metadata {:doc/format :markdown}
+          :source-paths ["modules/spandex/src/"]}
+  :profiles {:dev {:plugins [[lein-cljfmt "0.5.6"]
+                             [codox "0.10.2"]]}})
