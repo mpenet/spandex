@@ -1,6 +1,13 @@
 # spandex
 
-Elasticsearch (fast) [rest-client](https://www.elastic.co/guide/en/elasticsearch/client/java-rest/current/java-rest.html) ([official benchmark](https://www.elastic.co/blog/benchmarking-rest-client-transport-client)) wrapper (wip)
+Elasticsearch new [rest-client](https://www.elastic.co/guide/en/elasticsearch/client/java-rest/current/java-rest.html) wrapper
+
+## Why?
+
+Because the native client is a bit or a nightmare to deal with (for
+many reasons) and the new REST client is quite fast.
+
+See (["Benchmarking REST client and transport client "](https://www.elastic.co/blog/benchmarking-rest-client-transport-client))
 
 ## Goals
 
