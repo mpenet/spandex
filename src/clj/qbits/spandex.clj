@@ -79,7 +79,7 @@
 (extend-protocol BodyEncoder
   java.io.InputStream
   (encode-body [x]
-    (InputStreamEntity. (json/generate-stream (io/writer x))))
+    (InputStreamEntity. x))
 
   Raw
   (encode-body [x]
