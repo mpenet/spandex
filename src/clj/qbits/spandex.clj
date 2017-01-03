@@ -21,9 +21,12 @@
     HttpEntity)
    (org.apache.http.message
     BasicHeader)
+   (org.apache.http.nio.entity
+    NStringEntity)
    (org.apache.http.entity
-    StringEntity
-    InputStreamEntity)))
+    InputStreamEntity)
+   (java.nio.charset
+    StandardCharsets)))
 
 (defn client
   "Returns a client instance to be used to perform requests"
@@ -78,12 +81,15 @@
   (encode-body [x]
     (InputStreamEntity. (json/generate-stream (io/writer x))))
 
+  Raw
+  (encode-body [x]
+    (NStringEntity. ^String (:value x)
+                    StandardCharsets/UTF_8))
+
   Object
   (encode-body [x]
-    (StringEntity. (json/generate-string x)))
-
-  Raw
-  (encode-body [x] x)
+    (NStringEntity. (json/generate-string x )
+                    StandardCharsets/UTF_8))
 
   nil
   (encode-body [x] nil))
