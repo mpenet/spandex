@@ -2,6 +2,8 @@
   (:import
    (org.apache.http
     HttpHost)
+   (org.apache.http.message
+    BasicHeader)
    (org.elasticsearch.client
     RestClient
     RestClientBuilder
@@ -25,6 +27,12 @@
 (defmethod set-option! :max-retry-timeout
   [_ ^RestClientBuilder builder timeout-ms]
   (-> builder (.setMaxRetryTimeoutMillis (int timeout-ms))))
+
+(defmethod set-option! :default-headers
+  [_ ^RestClientBuilder builder headers]
+  (-> builder (.setDefaultHeaders (into-array BasicHeader
+                                              (map (fn [[k v]]
+                                                     (BasicHeader. (name k) v)))))))
 
 (defmethod set-option! :http-client-config-callback
   [_ ^RestClientBuilder builder f]
