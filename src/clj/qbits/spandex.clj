@@ -88,7 +88,7 @@
 
   Object
   (encode-body [x]
-    (NStringEntity. (json/generate-string x )
+    (NStringEntity. (json/generate-string x)
                     StandardCharsets/UTF_8))
 
   nil

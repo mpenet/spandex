@@ -10,6 +10,23 @@ many reasons) and the new REST client is quite fast.
 
 See ["Benchmarking REST client and transport client "](https://www.elastic.co/blog/benchmarking-rest-client-transport-client)
 
+
+...not to mention it supports some interesting features:
+
+* compatibility with any Elasticsearch version
+
+* load balancing across all available nodes
+
+* failover in case of node failures and upon specific response codes
+
+* failed connection penalization
+
+* persistent connections
+
+* trace logging of requests and responses
+
+* optional automatic discovery of cluster nodes (also known as sniffing)
+
 ## Goals
 
 * Be minimal & performant
