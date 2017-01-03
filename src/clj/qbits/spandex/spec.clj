@@ -76,7 +76,7 @@
         :args (s/cat :client ::client
                      :options ::request-async))
 
-(s/fdef qbits.spandex/request-ch
+(s/fdef qbits.spandex/request-chan
         :args (s/cat :client ::client
                      :options ::request-async)
         :ret #(instance? clojure.core.async.impl.channels.ManyToManyChannel %))
