@@ -1,4 +1,5 @@
 # spandex
+[![Build Status](https://travis-ci.org/mpenet/spandex.svg?branch=master)](https://travis-ci.org/mpenet/spandex)
 
 Elasticsearch new [rest-client](https://www.elastic.co/guide/en/elasticsearch/client/java-rest/current/java-rest.html) wrapper
 
