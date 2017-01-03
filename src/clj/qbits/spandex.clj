@@ -198,19 +198,16 @@
         (async/put! ch t)))
     ch))
 
-(def bulk->body
+(defn bulk->body
   "Utility function to create _bulk bodies. It takes a sequence of clj
   maps representing _bulk document fragments and returns a newline
   delimited string of JSON fragments"
-  (let [xform (map json/generate-string)
-        tf (fn
-             ([] (StringBuilder.))
-             ([^StringBuilder sb x]
-              (.append sb x)
-              (.append sb "\n"))
-             ([^StringBuilder sb] (.toString sb)))]
-    (fn [fragments]
-      (Raw. (transduce xform tf fragments)))))
+  [fragments]
+  (let [sb (StringBuilder.)]
+    (run! #(do (.append sb (json/generate-string %))
+               (.append sb"\n"))
+          fragments)
+    (-> sb .toString Raw.)))
 
 ;; (def x (client ["http://localhost:9200"]))
 ;; (def s (sniffer x))
