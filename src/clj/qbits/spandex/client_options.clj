@@ -32,7 +32,8 @@
   [_ ^RestClientBuilder builder headers]
   (-> builder (.setDefaultHeaders (into-array BasicHeader
                                               (map (fn [[k v]]
-                                                     (BasicHeader. (name k) v)))))))
+                                                     (BasicHeader. (name k) v))
+                                                   headers)))))
 
 (defmethod set-option! :http-client-config-callback
   [_ ^RestClientBuilder builder f]
