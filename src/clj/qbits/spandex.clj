@@ -186,7 +186,7 @@
                           (response-listener success error)
                           (encode-headers headers))))
 
-(defn request-ch
+(defn request-chan
   [^RestClient client options]
   (let [ch (async/promise-chan)]
     (try
