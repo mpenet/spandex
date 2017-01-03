@@ -10,8 +10,7 @@ many reasons) and the new REST client is quite fast.
 
 See ["Benchmarking REST client and transport client "](https://www.elastic.co/blog/benchmarking-rest-client-transport-client)
 
-
-...not to mention it supports some interesting features:
+Not to mention it supports some interesting features:
 
 * compatibility with any Elasticsearch version
 
