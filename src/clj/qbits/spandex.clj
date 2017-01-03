@@ -30,10 +30,10 @@
 
 (defn client
   "Returns a client instance to be used to perform requests"
-  ([hosts]
-   (client hosts {}))
-  ([hosts options]
-   (client-options/builder hosts options)))
+  ([]
+   (client {:hosts ["http://localhost:9200"]}))
+  ([options]
+   (client-options/builder options)))
 
 (def ^:no-doc sniffer-scheme (enum/enum->fn ElasticsearchHostsSniffer$Scheme))
 

@@ -34,7 +34,7 @@ See ["Benchmarking REST client and transport client "](https://www.elastic.co/bl
 
 (require '[qbits.spandex :as s])
 
-(def c (s/client ["http://127.0.0.1:9200" "http://foo2:3838"] {... options ...}))
+(def c (s/client {:hosts ["http://127.0.0.1:9200" "https://foo2:3838"]}))
 
 ;; add optional sniffer
 (def s (s/sniffer c {... options ...}))

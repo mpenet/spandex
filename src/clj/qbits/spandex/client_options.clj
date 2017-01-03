@@ -56,7 +56,8 @@
           builder
           options))
 
-(defn builder [hosts options]
+(defn builder [{:as options
+                :keys [hosts]}]
   (let [b (RestClient/builder (into-array HttpHost
                                           (map #(HttpHost/create %) hosts)))]
     (set-options! b options)
