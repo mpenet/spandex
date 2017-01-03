@@ -1,4 +1,4 @@
-(defproject cc.qbits/spandex "0.1.0"
+(defproject cc.qbits/spandex "0.1.1"
   :description ""
   :url "https://github.com/mpenet/spandex"
   :license {:name "Eclipse Public License"
