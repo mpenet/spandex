@@ -13,6 +13,7 @@
 
 (alias 'client-options (create-ns 'qbits.spandex.spec.client-options))
 (s/def ::client-options (s/keys :opt-un [::client-options/max-retry-timeout
+                                         ::client-options/default-headers
                                          ::client-options/http-client-config-callback
                                          ::client-options/request-config-callback
                                          ::client-options/failure-listener]))
@@ -21,6 +22,7 @@
 (s/def ::client-options/max-retry-timeout int?)
 (s/def ::client-options/request-config-callback fn?)
 (s/def ::client-options/http-client-config-callback fn?)
+(s/def ::client-options/default-headers (s/map-of (s/or :kw keyword? :str string?) string?))
 
 (alias 'sniffer-options (create-ns 'qbits.spandex.spec.sniffer-options))
 (s/def ::sniffer-options (s/keys :opt-un [::sniffer-options/sniff-interval
