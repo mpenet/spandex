@@ -26,9 +26,9 @@
 
 (alias 'sniffer-options (create-ns 'qbits.spandex.spec.sniffer-options))
 (s/def ::sniffer-options (s/keys :opt-un [::sniffer-options/sniff-interval
-                                          ::sniffer-options/sniff-after-failure-interval]))
+                                          ::sniffer-options/sniff-after-failure-delay]))
 (s/def ::sniffer-options/sniff-interval int?)
-(s/def ::sniffer-options/sniff-after-failure-interval int?)
+(s/def ::sniffer-options/sniff-after-failure-delay int?)
 
 (alias 'request (create-ns 'qbits.spandex.spec.request))
 (s/def ::request (s/keys :req-un [::request/url]
