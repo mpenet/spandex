@@ -33,7 +33,7 @@
 
   Options:
 
-  * `:hosts` : Collection of URIs of nodes - Defaults to \"http://localhost:9200\"
+  * `:hosts` : Collection of URIs of nodes - Defaults to [\"http://localhost:9200\"]
 
   * `:max-retry-timeout` : Sets the maximum timeout (in milliseconds) to
   honour in case of multiple retries of the same request. Defaults to
