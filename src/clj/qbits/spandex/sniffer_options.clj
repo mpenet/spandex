@@ -10,9 +10,9 @@
   [_ ^SnifferBuilder builder interval]
   (-> builder (.setSniffIntervalMillis (int interval))))
 
-(defmethod set-option! :sniff-after-failure-interval
-  [_ ^SnifferBuilder builder interval]
-  (-> builder (.setSniffAfterFailureDelayMillis (int interval))))
+(defmethod set-option! :sniff-after-failure-delay
+  [_ ^SnifferBuilder builder delay]
+  (-> builder (.setSniffAfterFailureDelayMillis (int delay))))
 
 (defmethod set-option! :default
   [_ ^SnifferBuilder b x]

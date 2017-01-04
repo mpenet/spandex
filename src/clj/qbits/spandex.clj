@@ -29,7 +29,33 @@
     StandardCharsets)))
 
 (defn client
-  "Returns a client instance to be used to perform requests"
+  "Returns a client instance to be used to perform requests.
+
+  Options:
+
+  * `:hosts` : Collection of URIs of nodes - Defaults to \"http://localhost:9200\"
+
+  * `:max-retry-timeout` : Sets the maximum timeout (in milliseconds) to
+  honour in case of multiple retries of the same request. Defaults to
+  30000
+
+  * `:default-headers` : Sets the default request headers, which will be
+  sent along with each request. Request-time headers will always
+  overwrite any default headers.
+
+  * `:failure-listener` : Sets the RestClient.FailureListener to be
+  notified for each request failure
+
+  * `:http-client-config-callback` : Sets the HttpClientConfigCallback
+  to be used to customize http client configuration
+
+  * `:request-config-callback` : Sets the RequestConfigCallback to be
+  used to customize http client configuration
+
+
+  If you need extra/custom building you can hook into the builder by
+  extending the multimethod
+  `qbits.spandex.client-options/set-option!`"
   ([]
    (client {:hosts ["http://localhost:9200"]}))
   ([options]
@@ -39,7 +65,21 @@
 
 (defn sniffer
   "Takes a Client instance (and possible sniffer options) and returns
-  a sniffer instance that will initially be bound to passed client."
+  a sniffer instance that will initially be bound to passed client.
+  Options:
+
+  * `:sniff-interval` : Sets the interval between consecutive ordinary
+  sniff executions in milliseconds. Will be honoured when
+  sniffOnFailure is disabled or when there are no failures between
+  consecutive sniff executions.
+
+  * `:sniff-after-failure-delay` : Sets the delay of a sniff execution
+  scheduled after a failure (in milliseconds)
+
+
+  If you need extra/custom building you can hook into the builder by
+  extending the multimethod
+  `qbits.spandex.sniffer-options/set-option!`"
   ([client]
    (sniffer client nil))
   ([client {:as options
