@@ -1,14 +1,16 @@
 # spandex
 [![Build Status](https://travis-ci.org/mpenet/spandex.svg?branch=master)](https://travis-ci.org/mpenet/spandex)
 
-Elasticsearch new [rest-client](https://www.elastic.co/guide/en/elasticsearch/client/java-rest/current/java-rest.html) wrapper
+Elasticsearch new low level [rest-client](https://www.elastic.co/guide/en/elasticsearch/client/java-rest/current/java-rest.html) wrapper
 
 ## Why?
 
-Because the native client is a bit of a nightmare to deal with (for
-many reasons) and the new REST client is quite fast.
+To quote ["State of the official Elasticsearch Java clients"](https://www.elastic.co/blog/state-of-the-official-elasticsearch-java-clients)
 
-See ["Benchmarking REST client and transport client "](https://www.elastic.co/blog/benchmarking-rest-client-transport-client)
+> The Java REST client is the future for Java users of Elasticsearch.
+
+Because the legacy native client is a bit of a nightmare to deal with
+(for many reasons) and the new REST client is quite fast, capable.
 
 Not to mention it supports some interesting features:
 
@@ -25,6 +27,9 @@ Not to mention it supports some interesting features:
 * trace logging of requests and responses
 
 * optional automatic discovery of cluster nodes (also known as sniffing)
+
+
+And is quite fast already: See ["Benchmarking REST client and transport client"](https://www.elastic.co/blog/benchmarking-rest-client-transport-client)
 
 ## Goals
 

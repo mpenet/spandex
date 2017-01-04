@@ -94,9 +94,6 @@
   nil
   (encode-body [x] nil))
 
-(defprotocol ^:no-doc BodyDecoder
-  (decode-body [x]))
-
 (defn ^:no-doc encode-headers
   [headers]
   (into-array Header
@@ -136,27 +133,31 @@
 (defrecord Response [body status headers hosts])
 
 (defn ^:no-doc response-decoder
-  [^org.elasticsearch.client.Response response]
+  [^org.elasticsearch.client.Response response keywordize?]
   (let [entity  (.getEntity response)
         content (.getContent entity)]
     (Response. (if (json-entity? entity)
-                 (-> content io/reader (json/parse-stream true))
+                 (-> content io/reader (json/parse-stream keywordize?))
                  (slurp content))
                (response-status response)
                (response-headers response)
                (.getHost response))))
 
 (defn ^:no-doc response-listener
-  [success error]
+  [success error keywordize?]
   (reify ResponseListener
     (onSuccess [this response]
-      (when success (success (response-decoder response))))
+      (when success
+        (success (response-decoder response keywordize?))))
     (onFailure [this ex]
-      (when error (error ex)))))
+      (when error
+        (error ex)))))
 
 (defn request
-  [^RestClient client {:keys [method url headers query-string body]
-                       :or {method :get}
+  [^RestClient client {:keys [method url headers query-string body
+                              keywordize?]
+                       :or {method :get
+                            keywordize? true}
                        :as request-params}]
   (-> client
       (.performRequest
@@ -165,14 +166,15 @@
        (encode-query-string query-string)
        (encode-body body)
        (encode-headers headers))
-      response-decoder))
+      (response-decoder keywordize?)))
 
 (defn request-async
   [^RestClient client
    {:keys [method url headers query-string body
-           success error
+           success error keywordize?
            response-consumer-factory]
-    :or {method :get}
+    :or {method :get
+         keywordize? true}
     :as request-params}]
   ;; eeek we can prolly avoid duplication here
   (if response-consumer-factory
@@ -182,14 +184,14 @@
                           (encode-query-string query-string)
                           (encode-body body)
                           response-consumer-factory
-                          (response-listener success error)
+                          (response-listener success error keywordize?)
                           (encode-headers headers))
     (.performRequestAsync client
                           (name method)
                           url
                           (encode-query-string query-string)
                           (encode-body body)
-                          (response-listener success error)
+                          (response-listener success error keywordize?)
                           (encode-headers headers))))
 
 (defn request-chan
