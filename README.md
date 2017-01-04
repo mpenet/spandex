@@ -10,7 +10,7 @@ To quote ["State of the official Elasticsearch Java clients"](https://www.elasti
 > The Java REST client is the future for Java users of Elasticsearch.
 
 Because the legacy native client is a bit of a nightmare to deal with
-(for many reasons) and the new REST client is quite fast, capable.
+(for many reasons) and the new REST client is quite capable.
 
 Not to mention it supports some interesting features:
 
@@ -28,8 +28,7 @@ Not to mention it supports some interesting features:
 
 * optional automatic discovery of cluster nodes (also known as sniffing)
 
-
-And is quite fast already: See ["Benchmarking REST client and transport client"](https://www.elastic.co/blog/benchmarking-rest-client-transport-client)
+And it is quite fast already: See ["Benchmarking REST client and transport client"](https://www.elastic.co/blog/benchmarking-rest-client-transport-client)
 
 ## Goals
 
@@ -50,7 +49,11 @@ And is quite fast already: See ["Benchmarking REST client and transport client"]
 * Provide [specs](https://github.com/mpenet/spandex/blob/master/src/clj/qbits/spandex/spec.clj)
 
 
-**here be dragons**
+We might provide a namepace with some sugar for common queries but
+this will not be the default. It'll likely just be a bunch of
+functions that operate on a query map accordingly.
+
+**Here be dragons**
 
 ``` clojure
 
