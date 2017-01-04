@@ -93,7 +93,7 @@ functions that operate on a query map accordingly.
 
 ## API Docs
 
-It's early days, so for now we have only [Codox generated docs](https://mpenet.github.io/spandex/)
+It's early days, so for now we have only [Codox generated docs](https://mpenet.github.io/spandex/qbits.spandex.html)
 Or the [clj.specs](https://github.com/mpenet/spandex/blob/master/src/clj/qbits/spandex/spec.clj) if that's your thing:
 
 ## License
