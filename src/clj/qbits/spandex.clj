@@ -209,6 +209,9 @@
       (response-decoder keywordize?)))
 
 (defn request-async
+  "Similar to `qbits.spandex/request` but returns immediately and works
+  asynchronously and triggers option `:success` once a results is
+  received, or `:error` if it was a failure"
   [^RestClient client
    {:keys [method url headers query-string body
            success error keywordize?
@@ -235,6 +238,9 @@
                           (encode-headers headers))))
 
 (defn request-chan
+  "Similar to `qbits.spandex/request` but runs asynchronously and
+  returns a `core.async/promise-chan` that will have the result (or
+  error) delivered upon reception"
   [^RestClient client options]
   (let [ch (async/promise-chan)]
     (try
