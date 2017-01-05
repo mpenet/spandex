@@ -1,12 +1,8 @@
 # spandex todo
 
-# Major
-
 * TODO start test suite
-* TODO clj.specs
-* TODO add all client/sniffer options
+* TODO sugar over callback based client options (this should be transparent)
 * TODO impl auth providers - https://www.elastic.co/guide/en/elasticsearch/client/java-rest/current/_basic_authentication.html
 * TODO encryption - https://www.elastic.co/guide/en/elasticsearch/client/java-rest/current/_encrypted_communication.html
-* TODO add body encoders/decoders
 * TODO perfs
 * TODO streamable bodies over reducers/channels/lazy-seq?
