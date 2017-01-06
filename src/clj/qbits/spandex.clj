@@ -276,17 +276,16 @@
             scroll-id (some-> response :body :_scroll_id)]
         (async/>! ch response)
         (if scroll-id
-          (do
-            (loop []
-              (let [response (async/<! (request-chan client
-                                                     {:url "/_search/scroll"
-                                                      :body {:scroll ttl :scroll_id scroll-id}}))]
-                (if (and (-> response :body :hits :hits seq)
-                         ;; we need to make sure the user didn't close the
-                         ;; returned chan for scroll interuption
-                         (async/>! ch response))
-                  (recur)
-                  (async/close! ch)))))
+          (loop []
+            (let [response (async/<! (request-chan client
+                                                   {:url "/_search/scroll"
+                                                    :body {:scroll ttl :scroll_id scroll-id}}))]
+              (if (and (-> response :body :hits :hits seq)
+                       ;; we need to make sure the user didn't close the
+                       ;; returned chan for scroll interuption
+                       (async/>! ch response))
+                (recur)
+                (async/close! ch))))
           ;; exit early on initial req not scrolling
           (async/close! ch))))
     ch))
