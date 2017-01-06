@@ -252,6 +252,50 @@
         (async/put! ch t)))
     ch))
 
+(defn scroll-chan
+  "Returns a core async channel. Takes the same args as
+  `qbits.spandex/request`. Perform async scrolling requests for a
+  query, request will be done as the user takes from the
+  channel. Every take!  will request/return a page from the
+  scroll. You can specify scroll :ttl in the request map otherwise
+  it'll default to 1m.  The chan will be closed once scroll is
+  complete. If you must stop scrolling before that, you must
+  async/close! manually, this will release all used resources. You can
+  also supply a :chan key to the request map, a core.async/chan that
+  will receive the results. This allow you to have custom buffers, or
+  have multiple scroll-chan calls feed the same channel instance"
+  [client {:as request-map :keys [ttl chan]
+           :or {ttl "1m"}}]
+  (let [ch (or chan (async/chan))]
+    (async/go
+      (let [response
+            (async/<! (request-chan client
+                                    (assoc-in request-map
+                                              [:query-string :scroll]
+                                              ttl)))
+            scroll-id (some-> response :body :_scroll_id)]
+        (async/>! ch response)
+        (if scroll-id
+          (do
+            (loop []
+              (let [response (async/<! (request-chan client
+                                                     {:url "/_search/scroll"
+                                                      :body {:scroll ttl :scroll_id scroll-id}}))]
+                (if (and (-> response :body :hits :hits seq)
+                         ;; we need to make sure the user didn't close the
+                         ;; returned chan for scroll interuption
+                         (async/>! ch response))
+                  (recur)
+                  (async/close! ch)))))
+          ;; exit early on initial req not scrolling
+          (async/close! ch))))
+    ch))
+
+;; (comment (def c (client))
+;;  (def ch (scroll-chan c {:url "/entries/entry/_search" :query-string {"q" "*"} }))
+;;  (prn (->> (async/<!! ch) :body :hits :hits (map :_id)))
+;;  (async/close! ch))
+
 (defn bulk->body
   "Utility function to create _bulk bodies. It takes a sequence of clj
   maps representing _bulk document fragments and returns a newline
