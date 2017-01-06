@@ -291,6 +291,13 @@
           (async/close! ch))))
     ch))
 
+(async/go
+  (let [ch (c/scroll-chan client {:url "/foo/_search" :body {:query {:match_all {}}}})]
+    (loop []
+      (when-let [page (async/<! ch)]
+        (do-something-with-page page)
+        (recur)))))
+
 ;; (comment (def c (client))
 ;;  (def ch (scroll-chan c {:url "/entries/entry/_search" :query-string {"q" "*"} }))
 ;;  (prn (->> (async/<!! ch) :body :hits :hits (map :_id)))

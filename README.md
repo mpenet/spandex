@@ -85,6 +85,17 @@ functions that operate on a query map accordingly.
                             :method :get
                             :body {:query {:match {:message "this is a test"}}}}))
 
+;; scrolling via core.async (fully NIO internally), interuptable if you async/close!
+;; the returned chan
+(async/go
+  (let [ch (c/scroll-chan client {:url "/foo/_search" :body {:query {:match_all {}}}})]
+    (loop []
+      (when-let [page (async/<! ch)]
+        (do-something-with-page page)
+        (recur)))))
+
+
+
 ```
 
 ## Installation
