@@ -14,7 +14,7 @@
 (def client (s/client))
 
 (defn wait! []
-  (Thread/sleep 3000))
+  (Thread/sleep 5000))
 
 (use-fixtures
   :each
