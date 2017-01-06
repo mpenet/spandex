@@ -275,7 +275,8 @@
                                               ttl)))
             scroll-id (some-> response :body :_scroll_id)]
         (async/>! ch response)
-        (if scroll-id
+        (if (and (-> response :body :hits :hits count (> 0))
+                 scroll-id)
           (loop []
             (let [response (async/<! (request-chan client
                                                    {:url "/_search/scroll"
@@ -290,11 +291,6 @@
           ;; exit early on initial req not scrolling
           (async/close! ch))))
     ch))
-
-;; (comment (def c (client))
-;;  (def ch (scroll-chan c {:url "/entries/entry/_search" :query-string {"q" "*"} }))
-;;  (prn (->> (async/<!! ch) :body :hits :hits (map :_id)))
-;;  (async/close! ch))
 
 (defn bulk->body
   "Utility function to create _bulk bodies. It takes a sequence of clj

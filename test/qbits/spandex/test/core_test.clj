@@ -1,8 +1,30 @@
 (ns qbits.spandex.test.core-test
   (:use clojure.test)
   (:require
+   [clojure.core.async :as async]
    [qbits.spandex :as s]
    [qbits.spandex.utils :as u]))
+
+(def server "http://127.0.0.1:9200")
+(def index (java.util.UUID/randomUUID))
+(def type (java.util.UUID/randomUUID))
+
+(def doc {:some {:fancy "thing"}})
+(def doc-id (java.util.UUID/randomUUID))
+(def client (s/client))
+
+(defn wait! []
+  (Thread/sleep 3000))
+
+(use-fixtures
+  :each
+  (fn [t]
+    (try
+      (s/request client
+                 {:method :delete
+                  :url (u/url [index type])})
+      (catch Exception _ nil))
+    (t)))
 
 (deftest test-url-utils
   (is (= (u/url [:foo 1 "bar"]) "foo/1/bar"))
@@ -16,3 +38,84 @@
   (is (= (:value (s/bulk->body [{:foo "bar"} {"bar" {:baz 1}}]))
          "{\"foo\":\"bar\"}\n{\"bar\":{\"baz\":1}}\n"))
   (is (= (:value (s/bulk->body [])) "")))
+
+(deftest test-sync-query
+  (is (->> (s/request client
+                      {:url (u/url [index type doc-id])
+                       :method :post
+                       :body doc})
+           :status
+           (contains? #{200 201})))
+
+  (is (-> (s/request client
+                     {:url (u/url [index type doc-id])
+                      :method :get})
+          :body
+          :_source
+          (= doc)))
+
+  (is (-> (s/request client
+                     {:url (u/url [index type doc-id])
+                      :method :get
+                      :keywordize? false})
+          :body
+          (get "_source")
+          (= (clojure.walk/stringify-keys doc)))))
+
+(deftest test-async-sync-query
+  (s/request client
+             {:url (u/url [index type doc-id])
+              :method :post
+              :body doc})
+  (let [p (promise)]
+    (s/request-async client
+                     {:url (u/url [index type doc-id])
+                      :method :get
+                      :success (fn [response]
+                                 (deliver p response))
+                      :error (fn [response]
+                               (deliver p response))})
+    (is (contains? #{200 201} (:status @p)))))
+
+
+(deftest test-scrolling-chan
+  (dotimes [i 99]
+    (s/request client
+               {:url (u/url [index type (str i)])
+                :method :post
+                :body doc}))
+  (wait!)
+  (let [ch (s/scroll-chan client {:url (u/url [index type :_search])})]
+    (-> (async/go
+          (loop [docs []]
+            (if-let [docs' (-> (async/<! ch) :body :hits :hits seq)]
+              (recur (concat docs docs'))
+              docs)))
+        async/<!!
+        count
+        (= 100)
+        is)))
+
+(deftest test-scrolling-chan-interupted
+  (dotimes [i 99]
+    (s/request client
+               {:url (u/url [index type (str i)])
+                :method :post
+                :body doc}))
+  (wait!)
+  (let [ch (s/scroll-chan client {:url (u/url [index type :_search])
+                                  :body {:size 1}})]
+    (-> (async/go
+          (loop [docs []
+                 countdown 33]
+            (when (zero? countdown)
+              (async/close! ch))
+            (if-let [docs' (-> (async/<! ch) :body :hits :hits seq)]
+              (do
+                (recur (concat docs docs')
+                       (dec countdown)))
+              docs)))
+        async/<!!
+        count
+        (= 33)
+        is)))
