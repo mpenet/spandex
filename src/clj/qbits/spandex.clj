@@ -279,7 +279,8 @@
           (loop []
             (let [response (async/<! (request-chan client
                                                    {:url "/_search/scroll"
-                                                    :body {:scroll ttl :scroll_id scroll-id}}))]
+                                                    :body {:scroll ttl
+                                                           :scroll_id scroll-id}}))]
               (if (and (-> response :body :hits :hits seq)
                        ;; we need to make sure the user didn't close the
                        ;; returned chan for scroll interuption
