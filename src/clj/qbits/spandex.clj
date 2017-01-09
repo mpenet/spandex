@@ -275,21 +275,26 @@
                                               ttl)))
             scroll-id (some-> response :body :_scroll_id)]
         (async/>! ch response)
-        (if (and (-> response :body :hits :hits count (> 0))
+        (when (and (-> response :body :hits :hits count (> 0))
                  scroll-id)
           (loop []
             (let [response (async/<! (request-chan client
                                                    {:url "/_search/scroll"
                                                     :body {:scroll ttl
                                                            :scroll_id scroll-id}}))]
-              (if (and (-> response :body :hits :hits seq)
-                       ;; we need to make sure the user didn't close the
-                       ;; returned chan for scroll interuption
-                       (async/>! ch response))
-                (recur)
-                (async/close! ch))))
-          ;; exit early on initial req not scrolling
-          (async/close! ch))))
+              (cond
+                ;; it's an error and we must exit the consuming process
+                (or (instance? Throwable response)
+                    (not= 200 (:status response)))
+                (async/>! response)
+
+                ;; we need to make sure the user didn't close the
+                ;; returned chan for scroll interuption and that we
+                ;; actually have more results to feed
+                (and (-> response :body :hits :hits seq)
+                     (async/>! ch response))
+                (recur)))f))
+        (async/close! ch)))
     ch))
 
 (defn bulk->body
