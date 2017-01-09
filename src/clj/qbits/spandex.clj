@@ -293,7 +293,7 @@
                 ;; actually have more results to feed
                 (and (-> response :body :hits :hits seq)
                      (async/>! ch response))
-                (recur)))f))
+                (recur)))))
         (async/close! ch)))
     ch))
 
