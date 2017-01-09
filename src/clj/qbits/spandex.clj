@@ -154,7 +154,7 @@
 
 (defn ^:no-doc encode-query-string
   [qs]
-  (reduce-kv (fn [m k v] (assoc m (name k) v))
+  (reduce-kv (fn [m k v] (assoc m (name k) (str v)))
              {}
              qs))
 
@@ -276,7 +276,7 @@
             scroll-id (some-> response :body :_scroll_id)]
         (async/>! ch response)
         (when (and (-> response :body :hits :hits count (> 0))
-                 scroll-id)
+                   scroll-id)
           (loop []
             (let [response (async/<! (request-chan client
                                                    {:url "/_search/scroll"
