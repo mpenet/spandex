@@ -42,16 +42,12 @@ And it is quite fast already: See ["Benchmarking REST client and transport clien
   Read ElasticSearch doc -> done, not another layer of indirection
 
 * Provide minimal (and totally optional) utils to do the boring stuff
-  (bulk, compose urls)
+  (bulk, scroll queries, compose urls)
 
 * Can do async via simple callbacks based api or `core.async`
 
 * Provide [specs](https://github.com/mpenet/spandex/blob/master/src/clj/qbits/spandex/spec.clj)
 
-
-We might provide a namepace with some sugar for common queries but
-this will not be the default. It'll likely just be a bunch of
-functions that operate on a query map accordingly.
 
 **Here be dragons**
 
@@ -93,9 +89,6 @@ functions that operate on a query map accordingly.
       (when-let [page (async/<! ch)]
         (do-something-with-page page)
         (recur)))))
-
-
-
 ```
 
 ## Installation
