@@ -84,7 +84,7 @@ And it is quite fast already: See ["Benchmarking REST client and transport clien
 ;; scrolling via core.async (fully NIO internally), interuptable if you async/close!
 ;; the returned chan
 (async/go
-  (let [ch (c/scroll-chan client {:url "/foo/_search" :body {:query {:match_all {}}}})]
+  (let [ch (s/scroll-chan client {:url "/foo/_search" :body {:query {:match_all {}}}})]
     (loop []
       (when-let [page (async/<! ch)]
         (do-something-with-page page)
