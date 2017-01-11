@@ -242,14 +242,19 @@
   returns a `core.async/promise-chan` that will have the result (or
   error) delivered upon reception"
   [^RestClient client options]
-  (let [ch (async/promise-chan)]
+  (let [ch (:chan options (async/promise-chan))]
     (try
       (request-async client
                      (assoc options
-                            :success (fn [response] (async/put! ch response))
-                            :error (fn [ex] (async/put! ch ex))))
+                            :success (fn [response]
+                                       (async/put! ch response)
+                                       (async/close! ch))
+                            :error (fn [ex]
+                                     (async/put! ch ex)
+                                     (async/close! ch))))
       (catch Throwable t
-        (async/put! ch t)))
+        (async/put! ch t)
+        (async/close! ch)))
     ch))
 
 (defn scroll-chan
@@ -312,3 +317,83 @@
 ;; (def s (sniffer x))
 ;; (request x {:url "entries/entry/_search" :method :get :body {}} )
 ;; (async/<!! (request-ch x {:url "/entries/entry" :method :post :body {:foo "bar"}} ))
+
+
+
+(def bulk-chan
+  "Bulk-chan takes a client, a partial request/option map, returns a
+  map of :input :output. :input is a channel that will accept bulk
+  fragments to be sent (either single or collection). It will
+  wait (:delay request-map) or (:max-items request-map) and then
+  trigger an async request with the bulk payload accumulated.
+  Parallelism of the async requests is controlable
+  via (:request-queue-size request-map). If number of triggered
+  requests exceed the capacity of the job buffer puts in input-ch will
+  block (if done with put! you can check the return value before
+  overflowing the put! pending queue). Jobs results returned from the
+  processing are a pair of job and responses map, or exception.  The
+  output-ch will allow you to inspect [job responses] the server
+  returned and handle potential errors/failures accordingly (retrying
+  etc). If you close! the :input it will close the underlying
+  resources and exit cleanly (comsumming all jobs that remain in
+  queues)"
+  (letfn [(par-run! [in-ch out-ch f n]
+            (dotimes [_ n]
+              (async/go
+                (loop []
+                  (when-let [job (async/<! in-ch)]
+                    (let [result (async/<! (f job))]
+                      (async/>! out-ch [job result]))
+                    (recur))))))
+          (build-map [request-map payload]
+            (assoc request-map
+                   :body
+                   (reduce (fn [payload chunk]
+                             (if (sequential? chunk)
+                               (concat payload chunk)
+                               (conj payload chunk)))
+                           []
+                           payload)))]
+    (fn [client {:as request-map
+                 :keys [delay max-items
+                        request-queue-size]
+                 :or {request-queue-size 3}}]
+      (let [input-ch (async/chan)
+            output-ch (async/chan)
+            request-queue-ch (async/chan request-queue-size)]
+        (par-run! request-queue-ch
+                  output-ch
+                  #(request-chan client %)
+                  request-queue-size)
+        ;; input consumer
+        (async/go
+          (loop [payload []
+                 timeout-ch (async/timeout delay)]
+            (let [[chunk ch] (async/alts! [timeout-ch input-ch])]
+              (cond
+                (= timeout-ch ch)
+                (do (when (seq payload)
+                      (async/>! request-queue-ch (build-map request-map
+                                                            payload)))
+                    (recur [] (async/timeout delay)))
+
+                (= input-ch ch)
+                (if (nil? chunk)
+                  (do (async/close! input-ch)
+                      (async/>! request-queue-ch (build-map request-map
+                                                            payload))
+                      (async/close! request-queue-ch))
+                  (let [payload (conj payload chunk)]
+                    (if (= max-items (count payload))
+                      (do (async/>! request-queue-ch (build-map request-map
+                                                                payload))
+                          (recur [] (async/timeout delay)))
+                      (recur payload timeout-ch))))))))
+        {:input input-ch
+         :output output-ch}))))
+
+;; (def c (bulk-chan nil {:delay 5000 :max-items 3}))
+;; (async/close! (:input c))
+;; (async/close! (:output c))
+;; (async/put! (:input c) (java.util.UUID/randomUUID))
+;; (future (loop [] (async/<!! (:output c))))
