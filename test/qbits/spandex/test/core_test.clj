@@ -34,10 +34,10 @@
   (is (= (u/url []) ""))
   (is (= (u/url nil) "")))
 
-(deftest test-bulk
-  (is (= (:value (s/bulk->body [{:foo "bar"} {"bar" {:baz 1}}]))
+(deftest test-chunks
+  (is (= (:value (s/chunks->body [{:foo "bar"} {"bar" {:baz 1}}]))
          "{\"foo\":\"bar\"}\n{\"bar\":{\"baz\":1}}\n"))
-  (is (= (:value (s/bulk->body [])) "")))
+  (is (= (:value (s/chunks->body [])) "")))
 
 (deftest test-sync-query
   (is (->> (s/request client

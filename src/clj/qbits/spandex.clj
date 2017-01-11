@@ -303,23 +303,21 @@
         (async/close! ch)))
     ch))
 
-(defn bulk->body
-  "Utility function to create _bulk bodies. It takes a sequence of clj
-  maps representing _bulk document fragments and returns a newline
-  delimited string of JSON fragments"
-  [fragments]
+(defn chunks->body
+  "Utility function to create _bulk/_msearch bodies. It takes a
+  sequence of clj fragments and returns a newline delimited string of
+  JSON fragments"
+  [chunks]
   (let [sb (StringBuilder.)]
     (run! #(do (.append sb (json/generate-string %))
-               (.append sb"\n"))
-          fragments)
+               (.append sb "\n"))
+          chunks)
     (-> sb .toString Raw.)))
 
 ;; (def x (client ["http://localhost:9200"]))
 ;; (def s (sniffer x))
 ;; (request x {:url "entries/entry/_search" :method :get :body {}} )
 ;; (async/<!! (request-ch x {:url "/entries/entry" :method :post :body {:foo "bar"}} ))
-
-
 
 (def bulk-chan
   "Bulk-chan takes a client, a partial request/option map, returns a
