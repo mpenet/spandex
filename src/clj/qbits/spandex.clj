@@ -242,7 +242,8 @@
   returns a `core.async/promise-chan` that will have the result (or
   error) delivered upon reception"
   [^RestClient client options]
-  (let [ch (:chan options (async/promise-chan))]
+  (let [ch (or (:chan options)
+               (async/promise-chan))]
     (try
       (request-async client
                      (assoc options
