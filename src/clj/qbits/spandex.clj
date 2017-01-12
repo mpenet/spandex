@@ -321,16 +321,16 @@
 (def bulk-chan
   "Bulk-chan takes a client, a partial request/option map, returns a
   map of :input-ch :output-ch. :input-ch is a channel that will accept
-  bulk fragments to be sent (either single or collection). It will
+  bulk fragments to be sent (either single or collection). It then will
   wait (:flush-interval request-map) or (:flush-threshold request-map)
   and then trigger an async request with the bulk payload accumulated.
-  Parallelism of the async requests is controlable
-  via (:max-concurrent-requests request-map). If number of triggered
-  requests exceed the capacity of the job buffer puts in input-ch will
-  block (if done with put! you can check the return value before
+  Parallelism of the async requests is controllable
+  via (:max-concurrent-requests request-map). If the number of triggered
+  requests exceeds the capacity of the job buffer, puts! in :input-ch will
+  block (if done with async/put! you can check the return value before
   overflowing the put! pending queue). Jobs results returned from the
   processing are a pair of job and responses map, or exception.  The
-  output-ch will allow you to inspect [job responses] the server
+  :output-ch will allow you to inspect [job responses] the server
   returned and handle potential errors/failures accordingly (retrying
   etc). If you close! the :input-ch it will close the underlying
   resources and exit cleanly (comsumming all jobs that remain in
