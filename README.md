@@ -85,9 +85,9 @@ And it is quite fast already: See ["Benchmarking REST client and transport clien
 ### Async requests: `core.async/promise-chan`
 
 ``` clojure
-(async/<!! (s/request-ch c {:url "/urls/url/"
-                            :method :get
-                            :body {:query {:match {:message "this is a test"}}}}))
+(async/<!! (s/request-chan c {:url "/urls/url/"
+                              :method :get
+                              :body {:query {:match {:message "this is a test"}}}}))
 ```
 
 ### Scrolling
