@@ -291,7 +291,7 @@
                 ;; it's an error and we must exit the consuming process
                 (or (instance? Throwable response)
                     (not= 200 (:status response)))
-                (async/>! response)
+                (async/>! ch response)
 
                 ;; we need to make sure the user didn't close the
                 ;; returned chan for scroll interuption and that we
