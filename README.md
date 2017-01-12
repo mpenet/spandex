@@ -107,7 +107,8 @@ async/close!the returned chan
 ### Bluk requests scheduling
 
 "Faux streaming" of _bulk requests (flushes bulk request after
-interval or threshold, you can specify these as options)
+interval or threshold, you can specify these as options). Uses
+request-chan internally, so it's quite cheap.
 
 ```clojure
 (let [{:keys [input-ch output-ch]} (bulk-chan client {:flush-threshold 100
