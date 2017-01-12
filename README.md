@@ -97,7 +97,7 @@ async/close!the returned chan
 
 ``` clojure
 (async/go
-  (let [ch (c/scroll-chan client {:url "/foo/_search" :body {:query {:match_all {}}}})]
+  (let [ch (s/scroll-chan client {:url "/foo/_search" :body {:query {:match_all {}}}})]
     (loop []
       (when-let [page (async/<! ch)]
         (do-something-with-page page)
