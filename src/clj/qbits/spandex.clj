@@ -242,8 +242,7 @@
   returns a `core.async/promise-chan` that will have the result (or
   error) delivered upon reception"
   [^RestClient client options]
-  (let [ch (or (:chan options)
-               (async/promise-chan))]
+  (let [ch (async/promise-chan)]
     (try
       (request-async client
                      (assoc options
@@ -267,12 +266,12 @@
   it'll default to 1m.  The chan will be closed once scroll is
   complete. If you must stop scrolling before that, you must
   async/close! manually, this will release all used resources. You can
-  also supply a :chan key to the request map, a core.async/chan that
+  also supply a :ch key to the request map, a core.async/chan that
   will receive the results. This allow you to have custom buffers, or
   have multiple scroll-chan calls feed the same channel instance"
-  [client {:as request-map :keys [ttl chan]
+  [client {:as request-map :keys [ttl ch]
            :or {ttl "1m"}}]
-  (let [ch (or chan (async/chan))]
+  (let [ch (or ch (async/chan))]
     (async/go
       (let [response
             (async/<! (request-chan client
@@ -354,45 +353,49 @@
                            []
                            payload)))]
     (fn [client {:as request-map
-                 :keys [delay max-items
-                        request-queue-size]
-                 :or {request-queue-size 3}}]
-      (let [input-ch (async/chan)
-            output-ch (async/chan)
-            request-queue-ch (async/chan request-queue-size)]
-        (par-run! request-queue-ch
+                 :keys [flush-interval
+                        flush-threshold
+                        input-ch
+                        output-ch
+                        max-concurrent-requests]
+                 :or {flush-interval 5000
+                      flush-threshold 300
+                      max-concurrent-requests 3}}]
+      (let [input-ch (or input-ch (async/chan))
+            output-ch (or output-ch (async/chan))
+            request-ch (async/chan max-concurrent-requests)]
+        ;; run request processor
+        (par-run! request-ch
                   output-ch
                   #(request-chan client %)
-                  request-queue-size)
-        ;; input consumer
+                  max-concurrent-requests
         (async/go
           (loop [payload []
-                 timeout-ch (async/timeout delay)]
+                 timeout-ch (async/timeout flush-interval)]
             (let [[chunk ch] (async/alts! [timeout-ch input-ch])]
               (cond
                 (= timeout-ch ch)
                 (do (when (seq payload)
-                      (async/>! request-queue-ch (build-map request-map
-                                                            payload)))
-                    (recur [] (async/timeout delay)))
+                      (async/>! request-ch (build-map request-map payload)))
+                    (recur [] (async/timeout flush-interval)))
 
                 (= input-ch ch)
                 (if (nil? chunk)
                   (do (async/close! input-ch)
-                      (async/>! request-queue-ch (build-map request-map
-                                                            payload))
-                      (async/close! request-queue-ch))
+                      (when (seq payload)
+                        (async/>! request-ch (build-map request-map payload)))
+                      (async/close! request-ch))
                   (let [payload (conj payload chunk)]
-                    (if (= max-items (count payload))
-                      (do (async/>! request-queue-ch (build-map request-map
-                                                                payload))
-                          (recur [] (async/timeout delay)))
+                    (if (= flush-threshold (count payload))
+                      (do (async/>! request-ch (build-map request-map payload))
+                          (recur [] (async/timeout flush-interval)))
                       (recur payload timeout-ch))))))))
-        {:input input-ch
-         :output output-ch}))))
+        {:input-ch input-ch
+         :output-ch output-ch
+         :request-ch request-ch}))))
 
-;; (def c (bulk-chan nil {:delay 5000 :max-items 3}))
-;; (async/close! (:input c))
-;; (async/close! (:output c))
-;; (async/put! (:input c) (java.util.UUID/randomUUID))
-;; (future (loop [] (async/<!! (:output c))))
+;; (def c (bulk-chan nil {}))
+;; (async/close! (:input-ch c))
+;; ;; (async/close! (:output c))
+;; (async/put! (:input-ch c) (java.util.UUID/randomUUID))
+;; (future (loop [] (async/<!! (:output-ch c))))
