@@ -346,56 +346,63 @@
           (build-map [request-map payload]
             (assoc request-map
                    :body
-                   (reduce (fn [payload chunk]
-                             (if (sequential? chunk)
-                               (concat payload chunk)
-                               (conj payload chunk)))
-                           []
-                           payload)))]
-    (fn [client {:as request-map
-                 :keys [flush-interval
-                        flush-threshold
-                        input-ch
-                        output-ch
-                        max-concurrent-requests]
-                 :or {flush-interval 5000
-                      flush-threshold 300
-                      max-concurrent-requests 3}}]
-      (let [input-ch (or input-ch (async/chan))
-            output-ch (or output-ch (async/chan))
-            request-ch (async/chan max-concurrent-requests)]
-        ;; run request processor
-        (par-run! request-ch
-                  output-ch
-                  #(request-chan client %)
-                  max-concurrent-requests
-        (async/go
-          (loop [payload []
-                 timeout-ch (async/timeout flush-interval)]
-            (let [[chunk ch] (async/alts! [timeout-ch input-ch])]
-              (cond
-                (= timeout-ch ch)
-                (do (when (seq payload)
-                      (async/>! request-ch (build-map request-map payload)))
-                    (recur [] (async/timeout flush-interval)))
+                   (->> payload
+                        (reduce (fn [payload chunk]
+                                  (if (sequential? chunk)
+                                    (concat payload chunk)
+                                    (conj payload chunk)))
+                                [])
+                        chunks->body)))]
+    (fn bulk-chan
+      ([client] (bulk-chan client {}))
+      ([client {:as request-map
+                :keys [flush-interval
+                       flush-threshold
+                       input-ch
+                       output-ch
+                       max-concurrent-requests]
+                :or {flush-interval 5000
+                     flush-threshold 300
+                     max-concurrent-requests 3}}]
+       (let [request-map (merge {:url "_bulk"} request-map)
+             input-ch (or input-ch (async/chan))
+             output-ch (or output-ch (async/chan))
+             request-ch (async/chan max-concurrent-requests)]
+         ;; run request processor
+         (par-run! request-ch
+                   output-ch
+                   #(do
+                      (prn (build-map request-map %))
+                      (request-chan client (build-map request-map %)))
+                   max-concurrent-requests)
+         (async/go
+           (loop [payload []
+                  timeout-ch (async/timeout flush-interval)]
+             (let [[chunk ch] (async/alts! [timeout-ch input-ch])]
+               (cond
+                 (= timeout-ch ch)
+                 (do (when (seq payload)
+                       (async/>! request-ch payload))
+                     (recur [] (async/timeout flush-interval)))
 
-                (= input-ch ch)
-                (if (nil? chunk)
-                  (do (async/close! input-ch)
-                      (when (seq payload)
-                        (async/>! request-ch (build-map request-map payload)))
-                      (async/close! request-ch))
-                  (let [payload (conj payload chunk)]
-                    (if (= flush-threshold (count payload))
-                      (do (async/>! request-ch (build-map request-map payload))
-                          (recur [] (async/timeout flush-interval)))
-                      (recur payload timeout-ch))))))))
-        {:input-ch input-ch
-         :output-ch output-ch
-         :request-ch request-ch}))))
+                 (= input-ch ch)
+                 (if (nil? chunk)
+                   (do (async/close! input-ch)
+                       (when (seq payload)
+                         (async/>! request-ch payload))
+                       (async/close! request-ch))
+                   (let [payload (conj payload chunk)]
+                     (if (= flush-threshold (count payload))
+                       (do (async/>! request-ch payload)
+                           (recur [] (async/timeout flush-interval)))
+                       (recur payload timeout-ch))))))))
+         {:input-ch input-ch
+          :output-ch output-ch
+          :request-ch request-ch})))))
 
-;; (def c (bulk-chan nil {}))
+;; (def c (bulk-chan nil))
+;; ;; (prn c)
 ;; (async/close! (:input-ch c))
-;; ;; (async/close! (:output c))
-;; (async/put! (:input-ch c) (java.util.UUID/randomUUID))
+;; ;; ;; ;; (async/close! (:output c))
+;; (async/put! (:input-ch c) [{:action "foo"} {:doc :bar}])
 ;; (future (loop [] (async/<!! (:output-ch c))))

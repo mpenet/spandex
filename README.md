@@ -89,6 +89,20 @@ And it is quite fast already: See ["Benchmarking REST client and transport clien
       (when-let [page (async/<! ch)]
         (do-something-with-page page)
         (recur)))))
+
+
+;; "faux streaming" of _bulk requests (flushes bulk request after
+interval or threshold, you can specify these as options)
+
+(let [{:keys [input-ch output-ch]} (bulk-chan client {:flush-threshold 100
+                                                      :flush-interval 5000
+                                                      :max-concurrent-requests 3})]
+  (async/put! input-ch [{:delete {:_index "foo" :_id "1234"}} {:_index :bar} {:create {...}}])
+  (async/put! input-ch {"delete" {"_index" "website" "_type" "blog" "_id" "123"}}))
+
+;; setup an response consumer (we just want to make sure we don't clog this channel)
+(future (loop [] (async/<!! (:output-ch c))))
+
 ```
 
 ## Installation
