@@ -376,9 +376,7 @@
          ;; run request processor
          (par-run! request-ch
                    output-ch
-                   #(do
-                      (prn (build-map request-map %))
-                      (request-chan client (build-map request-map %)))
+                   #(request-chan client (build-map request-map %))
                    max-concurrent-requests)
          (async/go
            (loop [payload []
