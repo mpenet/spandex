@@ -9,6 +9,9 @@
     RestClient
     RestClient$FailureListener)))
 
+(defn chan? [x]
+  (instance? clojure.core.async.impl.channels.ManyToManyChannel x))
+
 (s/def ::client #(instance? RestClient %))
 
 (alias 'client-options (create-ns 'qbits.spandex.spec.client-options))
@@ -81,11 +84,36 @@
 (s/fdef qbits.spandex/request-chan
         :args (s/cat :client ::client
                      :options ::request-async)
-        :ret #(instance? clojure.core.async.impl.channels.ManyToManyChannel %))
+        :ret chan?)
 
-(s/fdef qbits.spandex/bulk->body
+(s/fdef qbits.spandex/chunks->body
         :args (s/cat :fragments (s/coll-of map?))
         :ret string?)
+
+(s/def ::ttl int?)
+(s/def ::ch int?)
+(s/fdef qbits.spandex/scroll-chan
+        :args (s/cat :client ::client
+                     :options (s/and ::request (s/keys :opt-un [::ttl ::ch])))
+        :ret chan?)
+
+
+(s/def ::input-ch chan?)
+(s/def ::output-ch chan?)
+(s/def ::request-ch chan?)
+(s/def ::flush-interval pos-int?)
+(s/def ::flush-threshold pos-int?)
+(s/def ::max-concurrent-requests pos-int?)
+(s/def ::bulk-chan-options (s/and ::request
+                                  (s/keys :opt-un [::input-ch
+                                                   ::output-ch
+                                                   ::flush-threshold
+                                                   ::flush-interval
+                                                   ::max-concurrent-requests])))
+(s/fdef qbits.spandex/bulk-chan
+        :args (s/cat :client ::client
+                     :options ::bulk-chan-options)
+        :ret (s/keys :req-un [::input-ch ::output-ch ::request-ch]))
 
 ;; utils
 (alias 'utils (create-ns 'qbits.spandex.spec.utils))
