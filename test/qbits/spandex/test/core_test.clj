@@ -62,6 +62,14 @@
           (get "_source")
           (= (clojure.walk/stringify-keys doc)))))
 
+
+(deftest test-head-req
+  (is (-> (s/request client
+                     {:url (u/url [index type doc-id])
+                      :method :head})
+          :body
+          nil?)))
+
 (deftest test-async-sync-query
   (s/request client
              {:url (u/url [index type doc-id])
