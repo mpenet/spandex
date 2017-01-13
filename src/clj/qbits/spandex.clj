@@ -175,10 +175,11 @@
 (defn ^:no-doc response-decoder
   [^org.elasticsearch.client.Response response keywordize?]
   (let [entity  (.getEntity response)
-        content (.getContent entity)]
-    (Response. (if (json-entity? entity)
-                 (-> content io/reader (json/parse-stream keywordize?))
-                 (slurp content))
+        content (when entity (.getContent entity))]
+    (Response. (when entity
+                 (if (json-entity? entity)
+                   (-> content io/reader (json/parse-stream keywordize?))
+                   (slurp content)))
                (response-status response)
                (response-headers response)
                (.getHost response))))
