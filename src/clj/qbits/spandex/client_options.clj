@@ -22,16 +22,6 @@
    (org.elasticsearch.client.sniff
     SniffOnFailureListener)))
 
-(defn ^:no-doc request-config-callback [f]
-  (reify RestClientBuilder$RequestConfigCallback
-    (customizeRequestConfig [this builder]
-      (f builder))))
-
-(defn ^:no-doc http-client-config-callback [f]
-  (reify RestClientBuilder$HttpClientConfigCallback
-    (customizeHttpClient [this builder]
-      (f builder))))
-
 ;; request opts
 (defmulti set-request-option! (fn [k builder option] k))
 
@@ -156,23 +146,27 @@
   [_ ^RestClientBuilder builder options]
   ;; this dispatches on set-request-option!, see the following link for more details
   ;; https://hc.apache.org/httpcomponents-client-ga/httpclient/apidocs/org/apache/http/client/config/RequestConfig.Builder.html
-  (.setRequestConfigCallback builder
-                             (request-config-callback
-                              #(reduce (fn [builder [k option]]
-                                         (set-request-option! k builder option))
-                                       %
-                                       options))))
+  (-> builder
+      (.setRequestConfigCallback
+       (reify RestClientBuilder$RequestConfigCallback
+         (customizeRequestConfig [this builder]
+           (reduce (fn [builder [k option]]
+                     (set-request-option! k builder option))
+                   builder
+                 options))))))
 
 (defmethod set-option! :http-client
   [_ ^RestClientBuilder builder options]
   ;; this dispatches on set-http-client-option!, see the following link for more details
   ;; https://hc.apache.org/httpcomponents-asyncclient-dev/httpasyncclient/apidocs/org/apache/http/impl/nio/client/HttpAsyncClientBuilder.html
-  (.setHttpClientConfigCallback builder
-                                (http-client-config-callback
-                                 #(reduce (fn [builder [k option]]
-                                            (set-http-client-option! k builder option))
-                                          %
-                                          options))))
+  (-> builder
+      (.setHttpClientConfigCallback
+       (reify RestClientBuilder$HttpClientConfigCallback
+         (customizeHttpClient [this builder]
+           (reduce (fn [builder [k option]]
+                     (set-http-client-option! k builder option))
+                   builder
+                   options))))))
 
 (defmethod set-option! :sniff-on-failure
   [_ ^RestClientBuilder builder sniffer]
