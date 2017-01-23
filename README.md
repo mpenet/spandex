@@ -91,9 +91,8 @@ And it is quite fast already: See ["Benchmarking REST client and transport clien
 ```
 
 ### Scrolling
-
 Scrolling via core.async (fully NIO internally), interuptable if you
-async/close!the returned chan
+async/close! the returned chan.
 
 ``` clojure
 (async/go
