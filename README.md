@@ -127,7 +127,7 @@ request-chan internally, so it's quite cheap.
 
 ## API Docs
 
-It's early days, so for now we have only [Codox generated docs](https://mpenet.github.io/spandex/qbits.spandex.html)
+It's early days, so for now we have only [Codox generated docs](https://mpenet.github.io/spandex/qbits.spandex.html#var-client)
 Or the [clj.specs](https://github.com/mpenet/spandex/blob/master/src/clj/qbits/spandex/spec.clj) if that's your thing:
 
 ## License
