@@ -104,7 +104,7 @@ async/close!the returned chan
         (recur)))))
 ```
 
-### Bluk requests scheduling
+### Bulk requests scheduling
 
 "Faux streaming" of _bulk requests (flushes bulk request after
 interval or threshold, you can specify these as options). Uses
