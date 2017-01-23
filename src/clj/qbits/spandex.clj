@@ -47,30 +47,30 @@
   notified for each request failure
 
   * `:request` : request scoped config - extendable via the `qbits.client-options/set-request-option!` multimethod)
-      *  `authentication?`
-      *  `circular-redirect-allowed?`
-      *  `connect-timeout`
-      *  `connection-request-timeout`
-      *  `content-compression?`
-      *  `decompression?`
-      *  `expect-continue?`
-      *  `local-address`
-      *  `max-redirects`
-      *  `proxy`
-      *  `redirects?`
-      *  `relative-redirects-allowed?`
-      *  `socket-timeout`
-      *  `target-preferred-auth-schemes`
+      *  `:authentication?`
+      *  `:circular-redirect-allowed?`
+      *  `:connect-timeout`
+      *  `:connection-request-timeout`
+      *  `:content-compression?`
+      *  `:decompression?`
+      *  `:expect-continue?`
+      *  `:local-address`
+      *  `:max-redirects`
+      *  `:proxy`
+      *  `:redirects?`
+      *  `:relative-redirects-allowed?`
+      *  `:socket-timeout`
+      *  `:target-preferred-auth-schemes`
 
   * `:http-client` : http-client scoped config - extendable via the `qbits.client-options/set-http-client-option!` multimethod)
-      *  `max-conn-per-route`
-      *  `max-conn-total`
-      *  `proxy`
-      *  `ssl-context`
-      *  `user-agent`
-      *  `auth-caching?`
-      *  `cookie-management?`
-      *  `basic-auth` (map of `:username` `:password`)
+      *  `:max-conn-per-route`
+      *  `:max-conn-total`
+      *  `:proxy`
+      *  `:ssl-context`
+      *  `:user-agent`
+      *  `:auth-caching?`
+      *  `:cookie-management?`
+      *  `:basic-auth` (map of `:username` `:password`)
 
   If you need extra/custom building you can hook into the builder by
   extending the multimethod
