@@ -61,15 +61,29 @@ And it is quite fast already: See ["Benchmarking REST client and transport clien
 (def s (s/sniffer c {... options ...}))
 ```
 
+#### Constructing URLs
+
+Optionally, you can use small convenience function to construct URLs out of
+your indices, types, IDs etc. for the client.
+
+```clojure
+(require '[qbits.spandex.utils :as s-utils])
+
+(s-utils/url ["entries" "entry" "_search"])
+>> "entries/entry/_search"
+
+(s-utils/url [:entries [:entry :others] :_search])
+>> "entries/entry,others/_search"
+```
+
 ### Blocking requests
 
 ```clojure
-(s/request c {:url "/entries/entry/_search"
+(s/request c {:url (s-utils/url [:entries :entry :_search])
               :method :get
               :body {:query {:match_all {}}}})
 
 >> {:body {:_index "entries", :_type "entry", :_id "AVkDDJvdkd2OsNWu4oYk", :_version 1, :_shards {:total 2, :successful 1, :failed 0}, :created true}, :status 201, :headers {"Content-Type" "application/json; charset=UTF-8", "Content-Length" "141"}, :host #object[org.apache.http.HttpHost 0x62b90fad "http://127.0.0.1:9200"]}
-
 ```
 
 ### Async requests (callbacks)
