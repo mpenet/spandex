@@ -27,12 +27,12 @@
     (t)))
 
 (deftest test-url-utils
-  (is (= (u/url [:foo 1 "bar"]) "foo/1/bar"))
-  (is (= (u/url [:foo 1 nil "bar" nil]) "foo/1/bar"))
-  (is (= (u/url [:foo 1 ["bar" :baz 2]]) "foo/1/bar,baz,2"))
-  (is (= (u/url [:foo 1 ["bar" nil :baz nil 2]]) "foo/1/bar,baz,2"))
-  (is (= (u/url []) ""))
-  (is (= (u/url nil) "")))
+  (is (= (u/url [:foo 1 "bar"]) "/foo/1/bar"))
+  (is (= (u/url [:foo 1 nil "bar" nil]) "/foo/1/bar"))
+  (is (= (u/url [:foo 1 ["bar" :baz 2]]) "/foo/1/bar,baz,2"))
+  (is (= (u/url [:foo 1 ["bar" nil :baz nil 2]]) "/foo/1/bar,baz,2"))
+  (is (= (u/url []) "/"))
+  (is (= (u/url nil) "/")))
 
 (deftest test-chunks
   (is (= (:value (s/chunks->body [{:foo "bar"} {"bar" {:baz 1}}]))
