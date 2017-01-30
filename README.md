@@ -70,10 +70,10 @@ your indices, types, IDs etc. for the client.
 (require '[qbits.spandex.utils :as s-utils])
 
 (s-utils/url ["entries" "entry" "_search"])
->> "entries/entry/_search"
+>> "/entries/entry/_search"
 
 (s-utils/url [:entries [:entry :others] :_search])
->> "entries/entry,others/_search"
+>> "/entries/entry,others/_search"
 ```
 
 ### Blocking requests

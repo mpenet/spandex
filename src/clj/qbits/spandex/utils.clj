@@ -10,6 +10,11 @@
   ([^StringBuilder sb x] (.append sb x))
   ([^StringBuilder sb] (.toString sb)))
 
+(defn ^:no-doc url-string-builder
+  ([] (StringBuilder. "/"))
+  ([^StringBuilder sb x] (.append sb x))
+  ([^StringBuilder sb] (.toString sb)))
+
 (declare comma-sep+encoded-xform)
 
 (extend-protocol URLFragment
@@ -39,4 +44,4 @@
                     (map encode)
                     (interpose "/"))]
     (fn [parts]
-      (transduce xform string-builder parts))))
+      (transduce xform url-string-builder parts))))
