@@ -5,6 +5,8 @@
    [clojure.core.async :as async]
    [qbits.spandex.utils])
   (:import
+   (java.net InetAddress)
+   (javax.net.ssl SSLContext)
    (org.elasticsearch.client
     RestClient
     RestClient$FailureListener)))
@@ -17,15 +19,73 @@
 (alias 'client-options (create-ns 'qbits.spandex.spec.client-options))
 (s/def ::client-options (s/keys :opt-un [::client-options/max-retry-timeout
                                          ::client-options/default-headers
-                                         ::client-options/http-client-config-callback
-                                         ::client-options/request-config-callback
-                                         ::client-options/failure-listener]))
+                                         ::client-options/failure-listener
+                                         ::client-options/http-client
+                                         ::client-options/request]))
 
 (s/def ::client-options/failure-listener #(instance? RestClient$FailureListener %))
 (s/def ::client-options/max-retry-timeout int?)
-(s/def ::client-options/request-config-callback fn?)
-(s/def ::client-options/http-client-config-callback fn?)
 (s/def ::client-options/default-headers (s/map-of (s/or :kw keyword? :str string?) string?))
+
+(alias 'http-client-options (create-ns 'qbits.spandex.spec.client-options.http-client))
+(alias 'basic-auth
+       (create-ns 'qbits.spandex.spec.client-options.http-client.basic-auth))
+(s/def ::client-options/http-client
+  (s/keys :opt-un [::http-client-options/max-conn-per-route
+                   ::http-client-options/max-conn-total
+                   ::http-client-options/proxy
+                   ::http-client-options/ssl-context
+                   ::http-client-options/user-agent
+                   ::http-client-options/basic-auth
+                   ::http-client-options/auth-caching?
+                   ::http-client-options/cookie-management?]))
+(s/def ::http-client-options/max-conn-per-route pos-int?)
+(s/def ::http-client-options/max-conn-total pos-int?)
+(s/def ::http-client-options/user-agent string?)
+(s/def ::http-client-options/auth-caching? boolean?)
+(s/def ::http-client-options/cookie-management? boolean?)
+(s/def ::http-client-options/basic-auth
+  (s/keys :req-un [::basic-auth/user
+                   ::basic-auth/password]))
+(s/def ::http-client-options/ssl-context #(instance? SSLContext %))
+(s/def ::http-client-options/proxy any?)
+(s/def ::basic-auth/user string?)
+(s/def ::basic-auth/password string?)
+
+(alias 'request-options (create-ns 'qbits.spandex.spec.client-options.request))
+(s/def ::client-options/request
+  (s/keys :opt-un [::request-options/authentication?
+                   ::request-options/circular-redirect-allowed?
+                   ::request-options/connect-timeout
+                   ::request-options/connect-request-timeout
+                   ::request-options/content-compression?
+                   ::request-options/cookie-spec
+                   ::request-options/decompression?
+                   ::request-options/expect-continue?
+                   ::request-options/local-address
+                   ::request-options/cookie-spec
+                   ::request-options/max-redirects
+                   ::request-options/proxy
+                   ::request-options/redirects?
+                   ::request-options/relative-redirects-allowed?
+                   ::request-options/socket-timeout
+                   ::request-options/target-preferred-auth-schemes]))
+(s/def ::request-options/authentication? boolean?)
+(s/def ::request-options/circular-redirect-allowed? boolean?)
+(s/def ::request-options/content-compression? boolean?)
+(s/def ::request-options/decompression? boolean?)
+(s/def ::request-options/expect-continue? boolean?)
+(s/def ::request-options/redirect? boolean?)
+(s/def ::request-options/relative-redirects-allowed? boolean?)
+
+(s/def ::request-options/connect-timeout pos-int?)
+(s/def ::request-options/connect-request-timeout pos-int?)
+(s/def ::request-options/max-redirects int?)
+(s/def ::request-options/socket-timeout pos-int?)
+
+(s/def ::request-options/proxy any?)
+(s/def ::request-options/cookie-spec any?)
+(s/def ::request-options/local-address #(instance? InetAddress %))
 
 (alias 'sniffer-options (create-ns 'qbits.spandex.spec.sniffer-options))
 (s/def ::sniffer-options (s/keys :opt-un [::sniffer-options/sniff-interval
@@ -118,5 +178,5 @@
 ;; utils
 (alias 'utils (create-ns 'qbits.spandex.spec.utils))
 (s/fdef qbits.spandex.utils/url
-        :args (s/cat :parts (s/* #(satisfies? qbits.spandex.utils/URLFragment %)))
+        :args (s/cat :parts (s/* (s/nilable #(satisfies? qbits.spandex.utils/URLFragment %))))
         :ret string?)

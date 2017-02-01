@@ -5,6 +5,14 @@
    [qbits.spandex :as s]
    [qbits.spandex.utils :as u]))
 
+(try
+  (require 'qbits.spandex.spec)
+  (require 'clojure.spec.test)
+  ((resolve 'clojure.spec.test/instrument))
+  (println "Instrumenting qbits.spandex with clojure.spec")
+  (catch Exception e
+    (.printStackTrace e)))
+
 (def server "http://127.0.0.1:9200")
 (def index (java.util.UUID/randomUUID))
 (def type (java.util.UUID/randomUUID))
