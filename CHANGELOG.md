@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.8
+
+* Bump es client dependencies
+
 ## 0.2.7
 
 * better spec coverage for client options
