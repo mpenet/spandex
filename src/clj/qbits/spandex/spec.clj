@@ -11,8 +11,8 @@
     RestClient
     RestClient$FailureListener)))
 
-(s/def ::chan [x]
-  (instance? clojure.core.async.impl.channels.ManyToManyChannel x))
+(s/def ::chan
+  #(instance? clojure.core.async.impl.channels.ManyToManyChannel %))
 
 (s/def ::client #(instance? RestClient %))
 
