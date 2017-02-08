@@ -179,11 +179,10 @@
 
 (defn ^:no-doc json-entity?
   [^HttpEntity entity]
-  (-> entity
-      .getContentType
-      .getValue
-      (str/index-of "application/json")
-      some?))
+  (some-> entity
+          .getContentType
+          .getValue
+          (str/index-of "application/json")))
 
 (defn ^:no-doc response-status
   [^org.elasticsearch.client.Response response]
@@ -193,7 +192,7 @@
 
 (defn ^:no-doc response-decoder
   [^org.elasticsearch.client.Response response keywordize?]
-  (let [entity  (.getEntity response)
+  (let [entity (.getEntity response)
         content (when entity (.getContent entity))]
     (Response. (when entity
                  (if (json-entity? entity)
