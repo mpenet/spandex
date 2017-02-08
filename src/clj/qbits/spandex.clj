@@ -183,7 +183,7 @@
       .getContentType
       .getValue
       (str/index-of "application/json")
-      (> -1)))
+      some?))
 
 (defn ^:no-doc response-status
   [^org.elasticsearch.client.Response response]
