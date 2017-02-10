@@ -242,7 +242,7 @@
           (throw x)
           x)))))
 
-(def default-async-exception-handler
+(def async-default-exception-handler
   "Default async ex handler, values just pass through"
   (reify ExceptionHandler
     (handle-exception [this ex] ex)))
