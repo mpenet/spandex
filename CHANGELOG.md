@@ -27,10 +27,9 @@ You can overwrite this behavior in a few ways:
   calls `ExceptionDecoder/decode-exception` which is a protocol based
   function, when the result is a throwable it will rethrow otherwise
   it returns the value. That means you can just extend it if you
-  prefer to have `qbits.spandex.Response` as a value even when it and
-  "error". Doing so will also be valid for async request triggering
-  functions (minus the throwing).
-
+  prefer to have `qbits.spandex.Response` as a value. Doing so will
+  also be valid for async request triggering functions (minus the
+  throwing).
 
   something like the following
   ```clojure
