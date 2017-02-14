@@ -208,16 +208,14 @@
   (response-decoder (.getResponse re) true))
 
 (defn response-ex->ex-info
+  "Utility function to transform an ResponseException into an ex-info"
   [re]
   (ex-info "Response Exception"
            (assoc (response-ex->response re)
                   :type ::response-exception)))
 
-(defprotocol ExceptionHandler
-  (handle-exception [this x] "Control how to deal with exceptions"))
-
 (defprotocol ExceptionDecoder
-  (decode-exception [x] "Controls how to translate an exception (or not)"))
+  (decode-exception [x] "Controls how to translate a client exception"))
 
 (extend-protocol ExceptionDecoder
   ResponseException
@@ -226,32 +224,15 @@
   Object
   (decode-exception [x] x))
 
-(def default-exception-handler
-  "Throws on any Throwable (including \"bad\" response codes)"
-  (reify ExceptionHandler
-    (handle-exception [this ex]
-      (throw ex))))
+(def default-exception-handler #(throw %))
+(defn decoding-exception-handler
+  [ex]
+  (let [x (decode-exception ex)]
+    (if (instance? Throwable x)
+      (throw x)
+      x)))
 
-(def decoding-exception-handler
-  "Throws only on Throwable values after `decode-exception` (by
-  default will not throw ResponseExceptions)"
-  (reify ExceptionHandler
-    (handle-exception [this ex]
-      (let [x (decode-exception ex)]
-        (if (instance? Throwable x)
-          (throw x)
-          x)))))
-
-(def async-default-exception-handler
-  "Default async ex handler, values just pass through"
-  (reify ExceptionHandler
-    (handle-exception [this ex] ex)))
-
-(def async-decoding-exception-handler
-  "Default async ex handler, exceptions are decoded then pass through"
-  (reify ExceptionHandler
-    (handle-exception [this ex]
-      (decode-exception ex))))
+(def async-decoding-exception-handler decode-exception)
 
 (defn ^:no-doc response-listener
   [success error keywordize? exception-handler]
@@ -261,7 +242,7 @@
         (success (response-decoder response keywordize?))))
     (onFailure [this ex]
       (when error
-        (error (handle-exception exception-handler ex))))))
+        (error (exception-handler ex))))))
 
 (defn request
   [^RestClient client {:keys [method url headers query-string body
@@ -281,7 +262,7 @@
          (encode-headers headers))
         (response-decoder keywordize?))
     (catch Throwable t
-      (handle-exception exception-handler t))))
+      (exception-handler t))))
 
 (defn request-async
   "Similar to `qbits.spandex/request` but returns immediately and works
@@ -294,7 +275,7 @@
            exception-handler]
     :or {method :get
          keywordize? true
-         exception-handler default-async-exception-handler}
+         exception-handler identity}
     :as request-params}]
   ;; eeek we can prolly avoid duplication here
   (try
@@ -321,7 +302,7 @@
                                                exception-handler)
                             (encode-headers headers)))
     (catch Throwable t
-      (handle-exception exception-handler t))))
+      (exception-handler t))))
 
 (defn request-chan
   "Similar to `qbits.spandex/request` but runs asynchronously and
@@ -399,9 +380,9 @@
           chunks)
     (-> sb .toString Raw.)))
 
-;; (def x (client ["http://localhost:9200"]))
+;; (def x (client ))
 ;; (def s (sniffer x))
-;; (request x {:url "entries/entry/_search" :method :get :body {}} )
+;; (request x {:url "entries/entry/search" :method :get :body {} :exception-handler decoding-exception-handler})
 ;; (async/<!! (request-ch x {:url "/entries/entry" :method :post :body {:foo "bar"}} ))
 
 (def bulk-chan
