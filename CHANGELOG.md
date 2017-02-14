@@ -12,7 +12,8 @@ That means you can just call ex-data on it and get to it that way
     (catch clojure.lang.ExceptionInfo ex
        (prn (ex-data ex))))
 
-=> #qbits.spandex.Response{:type :qbits.spandex/response-exception
+=> #qbits.spandex.Response{
+    :type :qbits.spandex/response-exception
     :body "No handler found for uri [/a/a/a/a/a] and method [GET]"
     :status 400
     :headers {"Content-Type" "text/plain; charset=UTF-8", "Content-Length" "54"}
