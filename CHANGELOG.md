@@ -19,6 +19,8 @@ That means you can just call ex-data on it and get to it that way
     :headers {"Content-Type" "text/plain; charset=UTF-8", "Content-Length" "54"}
     :hosts #object[org.apache.http.HttpHost 0x968acb8 "http://localhost:9200"]}
 
+```
+
 You can overwrite this behavior in a few ways:
 
 * the default `:exception-handler` (aka `default-exception-handler`)
@@ -31,7 +33,7 @@ You can overwrite this behavior in a few ways:
 
 
   something like the following
-  ```
+  ```clojure
   (extend-protocol ExceptionDecoder
   ResponseException
   (decode-exception [x] (response-ex->response x)))
