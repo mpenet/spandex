@@ -100,7 +100,8 @@
                                   ::request/method
                                   ::request/headers
                                   ::request/query-string
-                                  ::request/body]))
+                                  ::request/body
+                                  ::request/exception-handler]))
 
 (s/def ::request/url string?)
 (s/def ::request/scheme #{:http :https})
@@ -114,6 +115,9 @@
                             :raw #(instance? qbits.spandex.Raw %)
                             :stream #(instance? java.io.InputStream %)
                             :edn any?))
+
+(s/def ::request/exception-handler
+  (s/fspec :args (s/cat :throwable #(instance? Throwable %))))
 
 (alias 'response (create-ns 'qbits.spandex.spec.response))
 (s/def ::response (s/keys :req-un [::response/body
