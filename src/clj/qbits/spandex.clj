@@ -15,7 +15,8 @@
     SniffOnFailureListener)
    (org.elasticsearch.client
     RestClient
-    ResponseListener)
+    ResponseListener
+    ResponseException)
    (org.apache.http
     Header
     HttpEntity)
@@ -202,30 +203,66 @@
                (response-headers response)
                (.getHost response))))
 
+(defn response-ex->response
+  [^ResponseException re]
+  (response-decoder (.getResponse re) true))
+
+(defn response-ex->ex-info
+  "Utility function to transform an ResponseException into an ex-info"
+  [re]
+  (ex-info "Response Exception"
+           (assoc (response-ex->response re)
+                  :type ::response-exception)))
+
+(defprotocol ExceptionDecoder
+  (decode-exception [x] "Controls how to translate a client exception"))
+
+(extend-protocol ExceptionDecoder
+  ResponseException
+  (decode-exception [re]
+    (response-ex->response re))
+  Object
+  (decode-exception [x] x))
+
+(def default-exception-handler #(throw %))
+(defn decoding-exception-handler
+  [ex]
+  (let [x (decode-exception ex)]
+    (if (instance? Throwable x)
+      (throw x)
+      x)))
+
+(def async-decoding-exception-handler decode-exception)
+
 (defn ^:no-doc response-listener
-  [success error keywordize?]
+  [success error keywordize? exception-handler]
   (reify ResponseListener
     (onSuccess [this response]
       (when success
         (success (response-decoder response keywordize?))))
     (onFailure [this ex]
       (when error
-        (error ex)))))
+        (error (exception-handler ex))))))
 
 (defn request
   [^RestClient client {:keys [method url headers query-string body
-                              keywordize?]
+                              keywordize?
+                              exception-handler]
                        :or {method :get
-                            keywordize? true}
+                            keywordize? true
+                            exception-handler default-exception-handler}
                        :as request-params}]
-  (-> client
-      (.performRequest
-       (name method)
-       url
-       (encode-query-string query-string)
-       (encode-body body)
-       (encode-headers headers))
-      (response-decoder keywordize?)))
+  (try
+    (-> client
+        (.performRequest
+         (name method)
+         url
+         (encode-query-string query-string)
+         (encode-body body)
+         (encode-headers headers))
+        (response-decoder keywordize?))
+    (catch Throwable t
+      (exception-handler t))))
 
 (defn request-async
   "Similar to `qbits.spandex/request` but returns immediately and works
@@ -234,27 +271,38 @@
   [^RestClient client
    {:keys [method url headers query-string body
            success error keywordize?
-           response-consumer-factory]
+           response-consumer-factory
+           exception-handler]
     :or {method :get
-         keywordize? true}
+         keywordize? true
+         exception-handler identity}
     :as request-params}]
   ;; eeek we can prolly avoid duplication here
-  (if response-consumer-factory
-    (.performRequestAsync client
-                          (name method)
-                          url
-                          (encode-query-string query-string)
-                          (encode-body body)
-                          response-consumer-factory
-                          (response-listener success error keywordize?)
-                          (encode-headers headers))
-    (.performRequestAsync client
-                          (name method)
-                          url
-                          (encode-query-string query-string)
-                          (encode-body body)
-                          (response-listener success error keywordize?)
-                          (encode-headers headers))))
+  (try
+    (if response-consumer-factory
+      (.performRequestAsync client
+                            (name method)
+                            url
+                            (encode-query-string query-string)
+                            (encode-body body)
+                            response-consumer-factory
+                            (response-listener success
+                                               error
+                                               keywordize?
+                                               exception-handler)
+                            (encode-headers headers))
+      (.performRequestAsync client
+                            (name method)
+                            url
+                            (encode-query-string query-string)
+                            (encode-body body)
+                            (response-listener success
+                                               error
+                                               keywordize?
+                                               exception-handler)
+                            (encode-headers headers)))
+    (catch Throwable t
+      (exception-handler t))))
 
 (defn request-chan
   "Similar to `qbits.spandex/request` but runs asynchronously and
@@ -332,9 +380,9 @@
           chunks)
     (-> sb .toString Raw.)))
 
-;; (def x (client ["http://localhost:9200"]))
+;; (def x (client ))
 ;; (def s (sniffer x))
-;; (request x {:url "entries/entry/_search" :method :get :body {}} )
+;; (request x {:url "entries/entry/search" :method :get :body {} :exception-handler decoding-exception-handler})
 ;; (async/<!! (request-ch x {:url "/entries/entry" :method :post :body {:foo "bar"}} ))
 
 (def bulk-chan
