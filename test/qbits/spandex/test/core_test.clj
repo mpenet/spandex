@@ -3,7 +3,8 @@
   (:require
    [clojure.core.async :as async]
    [qbits.spandex :as s]
-   [qbits.spandex.utils :as u]))
+   [qbits.spandex.utils :as u])
+  (:import (qbits.spandex Response)))
 
 (try
   (require 'qbits.spandex.spec)
@@ -135,3 +136,20 @@
         count
         (= 33)
         is)))
+
+(deftest test-exceptions []
+  (is (try (s/request client {:url "a/b/c/d/"})
+           (catch clojure.lang.ExceptionInfo ex
+             (->> ex ex-data (instance? qbits.spandex.Response)))))
+  (is (try (s/request client {:url "a/b/c/d/" :exception-handler #(throw %)})
+           (catch org.elasticsearch.client.ResponseException ex
+             true)
+           (catch Throwable _
+             false)))
+  (->> (async/<!! (s/request-chan client {:url "a/b/c/d/"}))
+       ex-data
+       (instance? qbits.spandex.Response)
+       is)
+  (->> (async/<!! (s/request-chan client {:url "a/b/c/d/" :exception-handler identity}))
+       (instance? org.elasticsearch.client.ResponseException)
+       is))

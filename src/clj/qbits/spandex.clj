@@ -204,6 +204,7 @@
                (.getHost response))))
 
 (defn response-ex->response
+  "Return the response-map wrapped in a ResponseException"
   [^ResponseException re]
   (response-decoder (.getResponse re) true))
 
@@ -219,20 +220,21 @@
 
 (extend-protocol ExceptionDecoder
   ResponseException
-  (decode-exception [re]
-    (response-ex->response re))
+  (decode-exception [x] (response-ex->ex-info x))
   Object
   (decode-exception [x] x))
 
-(def default-exception-handler #(throw %))
-(defn decoding-exception-handler
+(defn default-exception-handler
+  "Exception handler that will try to decode Exceptions via
+  ExceptionDecoder/decode-exception. If after decoding we still have a
+  throwable it will rethrow, otherwise it will pass on the value
+  returned. You can then extend ExceptionDecoder/decode-exception to
+  do whatever you'd like."
   [ex]
   (let [x (decode-exception ex)]
     (if (instance? Throwable x)
       (throw x)
       x)))
-
-(def async-decoding-exception-handler decode-exception)
 
 (defn ^:no-doc response-listener
   [success error keywordize? exception-handler]
@@ -275,7 +277,7 @@
            exception-handler]
     :or {method :get
          keywordize? true
-         exception-handler identity}
+         exception-handler decode-exception}
     :as request-params}]
   ;; eeek we can prolly avoid duplication here
   (try

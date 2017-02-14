@@ -1,5 +1,45 @@
 # Changelog
 
+## 0.3.0
+
+ResponseExceptions are now returned as ex-info instances wrapping the
+real response decoded as clojure map.
+
+That means you can just call ex-data on it and get to it that way
+
+```clojure
+ (try (s/request client {:url "/a/a/a/a/a"})
+    (catch clojure.lang.ExceptionInfo ex
+       (prn (ex-data ex))))
+
+=> #qbits.spandex.Response{:type :qbits.spandex/response-exception
+    :body "No handler found for uri [/a/a/a/a/a] and method [GET]"
+    :status 400
+    :headers {"Content-Type" "text/plain; charset=UTF-8", "Content-Length" "54"}
+    :hosts #object[org.apache.http.HttpHost 0x968acb8 "http://localhost:9200"]}
+
+You can overwrite this behavior in a few ways:
+
+* the default `:exception-handler` (aka `default-exception-handler`)
+  calls `ExceptionDecoder/decode-exception` which is a protocol based
+  function, when the result is a throwable it will rethrow otherwise
+  it returns the value. That means you can just extend it if you
+  prefer to have `qbits.spandex.Response` as a value even when it and
+  "error". Doing so will also be valid for async request triggering
+  functions (minus the throwing).
+
+
+  something like the following
+  ```
+  (extend-protocol ExceptionDecoder
+  ResponseException
+  (decode-exception [x] (response-ex->response x)))
+  ```
+
+* Or you can pass your own `:exception-handler` to all request triggering
+  functions to do whatever you'd like and bypass the protocol altogether.
+
+
 ## 0.2.8
 
 * Bump es client dependencies
