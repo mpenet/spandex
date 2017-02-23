@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.4
+
+* Bump core.async dependency to 0.3.441
+
 ## 0.3.3
 
 * Bump core.async dependency to 0.3.436
