@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.2
+
+* Bump core.async dependency to 0.3.426
+
+## 0.3.1
+
+* Bump ES client dependency to 5.2.1
+
 ## 0.3.0
 
 ResponseExceptions are now returned as ex-info instances wrapping the
