@@ -1,4 +1,5 @@
 (ns qbits.spandex.test.core-test
+  (:refer-clojure :exclude [type])
   (:use clojure.test)
   (:require
    [clojure.core.async :as async]

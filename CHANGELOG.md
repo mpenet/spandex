@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.5
+
+* Bump ES client dependency to 5.2.2
+
 ## 0.3.4
 
 * Bump core.async dependency to 0.3.441

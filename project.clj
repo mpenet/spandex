@@ -1,12 +1,13 @@
-(defproject cc.qbits/spandex "0.3.4"
+(def es-client-version "5.2.2")
+(defproject cc.qbits/spandex "0.3.5"
   :description "Clojure Wrapper of the new/official ElasticSearch REST client"
   :url "https://github.com/mpenet/spandex"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.9.0-alpha14"]
                  [org.clojure/core.async "0.3.441"]
-                 [org.elasticsearch.client/rest "5.2.1"]
-                 [org.elasticsearch.client/sniffer "5.2.1"]
+                 [org.elasticsearch.client/rest ~es-client-version]
+                 [org.elasticsearch.client/sniffer ~es-client-version]
                  [cc.qbits/commons "0.4.6"]
                  [cheshire "5.6.3"]]
   :source-paths ["src/clj"]
