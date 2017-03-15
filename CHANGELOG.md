@@ -2,6 +2,12 @@
 
 ## 0.3.5
 
+* Bump dependencies (cheshire, codox)
+
+* make `scroll-chan` 2.x- compatible
+
+## 0.3.5
+
 * Bump ES client dependency to 5.2.2
 
 ## 0.3.4
