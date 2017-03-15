@@ -71,7 +71,7 @@
       *  `:user-agent`
       *  `:auth-caching?`
       *  `:cookie-management?`
-      *  `:basic-auth` (map of `:username` `:password`)
+      *  `:basic-auth` (map of `:user` `:password`)
 
   If you need extra/custom building you can hook into the builder by
   extending the multimethod
