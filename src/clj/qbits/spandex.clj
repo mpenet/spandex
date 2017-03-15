@@ -354,8 +354,8 @@
           (loop []
             (let [response (async/<! (request-chan client
                                                    {:url "/_search/scroll"
-                                                    :body {:scroll ttl
-                                                           :scroll_id scroll-id}}))]
+                                                    :query-string {:scroll ttl}
+                                                    :body (Raw. scroll-id)}))]
               (cond
                 ;; it's an error and we must exit the consuming process
                 (or (instance? Throwable response)
