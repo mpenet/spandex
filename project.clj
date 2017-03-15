@@ -9,7 +9,7 @@
                  [org.elasticsearch.client/rest ~es-client-version]
                  [org.elasticsearch.client/sniffer ~es-client-version]
                  [cc.qbits/commons "0.4.6"]
-                 [cheshire "5.6.3"]]
+                 [cheshire "5.7.0"]]
   :source-paths ["src/clj"]
   :global-vars {*warn-on-reflection* true}
   :codox {:source-uri "https://github.com/mpenet/spandex/blob/master/{filepath}#L{line}"
@@ -18,4 +18,4 @@
           :doc-files ["docs/quickstart.md"]
           :source-paths ["src/clj"]}
   :profiles {:dev {:plugins [[lein-cljfmt "0.5.6"]
-                             [codox "0.10.2"]]}})
+                             [codox "0.10.3"]]}})
