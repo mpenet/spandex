@@ -3,7 +3,7 @@
 ## 0.3.7
 
 * Bump ES client dependency to 5.3.0
-* Bump clj to 1.8a15
+* Bump clj to 1.9a15
 * Bump core.async to 0.3.442
 
 ## 0.3.5
