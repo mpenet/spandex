@@ -46,11 +46,11 @@
 (s/def ::http-client-options/auth-caching? boolean?)
 (s/def ::http-client-options/cookie-management? boolean?)
 (s/def ::http-client-options/basic-auth
-  (s/keys :req-un [::basic-auth/user
+  (s/keys :req-un [::basic-auth/username
                    ::basic-auth/password]))
 (s/def ::http-client-options/ssl-context #(instance? SSLContext %))
 (s/def ::http-client-options/proxy any?)
-(s/def ::basic-auth/user string?)
+(s/def ::basic-auth/username string?)
 (s/def ::basic-auth/password string?)
 
 (alias 'request-options (create-ns 'qbits.spandex.spec.client-options.request))

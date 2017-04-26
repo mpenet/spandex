@@ -120,12 +120,12 @@
     (not cookie-management?) (.disableCookieManagement)))
 
 (defmethod set-http-client-option! :basic-auth
-  [_ ^HttpAsyncClientBuilder builder {:keys [user password]}]
+  [_ ^HttpAsyncClientBuilder builder {:keys [username password]}]
   (-> builder
       (.setDefaultCredentialsProvider
        (doto (BasicCredentialsProvider.)
          (.setCredentials AuthScope/ANY
-                          (UsernamePasswordCredentials. user
+                          (UsernamePasswordCredentials. username
                                                         password))))))
 
 ;; top level options
