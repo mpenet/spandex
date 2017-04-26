@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.8
+
+* Bump ES client dependency to 5.3.1
+* Prefix _bulk endpoint with leading slash
+
 ## 0.3.7
 
 * Bump ES client dependency to 5.3.0
