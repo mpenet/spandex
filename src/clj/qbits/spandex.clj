@@ -435,7 +435,7 @@
                 :or {flush-interval 5000
                      flush-threshold 300
                      max-concurrent-requests 3}}]
-       (let [request-map (merge {:url "_bulk"
+       (let [request-map (merge {:url "/_bulk"
                                  :method :put
                                  :headers {"content-type" "text/plain"}}
                                 request-map)
