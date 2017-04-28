@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.9
+
+* Bump clj to 1.9a16
+
 ## 0.3.8
 
 * Bump ES client dependency to 5.3.1

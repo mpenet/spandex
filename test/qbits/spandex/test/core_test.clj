@@ -9,8 +9,8 @@
 
 (try
   (require 'qbits.spandex.spec)
-  (require 'clojure.spec.test)
-  ((resolve 'clojure.spec.test/instrument))
+  (require 'clojure.spec.test.alpha)
+  ((resolve 'clojure.spec.test.alpha/instrument))
   (println "Instrumenting qbits.spandex with clojure.spec")
   (catch Exception e
     (.printStackTrace e)))

@@ -1,7 +1,7 @@
 (ns qbits.spandex.spec
   (:require
    [qbits.spandex]
-   [clojure.spec :as s]
+   [clojure.spec.alpha :as s]
    [clojure.core.async :as async]
    [qbits.spandex.utils])
   (:import
