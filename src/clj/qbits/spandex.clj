@@ -407,13 +407,20 @@
   map is passed as is to request-chan, you can overwrite options here
   and provide your own url, headers and so on."
   (letfn [(par-run! [in-ch out-ch f n]
-            (dotimes [_ n]
-              (async/go
-                (loop []
-                  (when-let [job (async/<! in-ch)]
-                    (let [result (async/<! (f job))]
-                      (async/>! out-ch [job result]))
-                    (recur))))))
+            (let [procs (async/merge (repeatedly n
+                                                 (fn []
+                                                   (async/go-loop []
+                                                     (if-let [job (async/<! in-ch)]
+                                                       (let [result (async/<! (f job))]
+                                                         (async/>! out-ch [job result])
+                                                         (recur))
+                                                       ::exit))))
+                                     n)]
+              ;; if upstream ports are closed propagate close! to out-ch
+              (async/go-loop []
+                (if (async/<! procs)
+                  (recur)
+                  (async/close! out-ch)))))
           (build-map [request-map payload]
             (assoc request-map
                    :body
@@ -447,34 +454,34 @@
                    output-ch
                    #(request-chan client (build-map request-map %))
                    max-concurrent-requests)
-         (async/go
-           (loop [payload []
-                  timeout-ch (async/timeout flush-interval)]
-             (let [[chunk ch] (async/alts! [timeout-ch input-ch])]
-               (cond
-                 (= timeout-ch ch)
-                 (do (when (seq payload)
-                       (async/>! request-ch payload))
-                     (recur [] (async/timeout flush-interval)))
+         (async/go-loop
+             [payload []
+              timeout-ch (async/timeout flush-interval)]
+           (let [[chunk ch] (async/alts! [timeout-ch input-ch])]
+             (cond
+               (= timeout-ch ch)
+               (do (when (seq payload)
+                     (async/>! request-ch payload))
+                   (recur [] (async/timeout flush-interval)))
 
-                 (= input-ch ch)
-                 (if (nil? chunk)
-                   (do (async/close! input-ch)
-                       (when (seq payload)
-                         (async/>! request-ch payload))
-                       (async/close! request-ch))
-                   (let [payload (conj payload chunk)]
-                     (if (= flush-threshold (count payload))
-                       (do (async/>! request-ch payload)
-                           (recur [] (async/timeout flush-interval)))
-                       (recur payload timeout-ch))))))))
+               (= input-ch ch)
+               (if (nil? chunk)
+                 (do (async/close! input-ch)
+                     (when (seq payload)
+                       (async/>! request-ch payload))
+                     (async/close! request-ch))
+                 (let [payload (conj payload chunk)]
+                   (if (= flush-threshold (count payload))
+                     (do (async/>! request-ch payload)
+                         (recur [] (async/timeout flush-interval)))
+                     (recur payload timeout-ch)))))))
          {:input-ch input-ch
           :output-ch output-ch
           :request-ch request-ch})))))
 
-;; (def c (bulk-chan nil))
-;; ;; (prn c)
-;; (async/close! (:input-ch c))
-;; ;; ;; ;; (async/close! (:output c))
-;; (async/put! (:input-ch c) [{:action "foo"} {:doc :bar}])
-;; (future (loop [] (async/<!! (:output-ch c))))
+;; (def x (bulk-chan (client)))
+;; (async/close! (:input-ch x))
+;; (async/close! (:request-ch x))
+;; (async/close! (:output-ch x))
+;; (async/put! (:input-ch x) {"delete" {"_index" "website" "_type" "blog" "_id" "123"}})
+;; (prn (async/<!! (:output-ch x)))

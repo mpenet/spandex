@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.10
+
+* bulk-chan: if the user closes :input-ch to signal the need to end
+  the process all pending messages will be processed and upon
+  completion :output-ch will be closed (it wasn't the case before)
+
 ## 0.3.9
 
 * Bump clj to 1.9a16
