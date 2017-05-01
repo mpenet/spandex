@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.4.10
+## 0.3.10
 
 * bulk-chan: if the user closes :input-ch to signal the need to end
   the process all pending messages will be processed and upon
