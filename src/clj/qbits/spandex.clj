@@ -478,19 +478,3 @@
          {:input-ch input-ch
           :output-ch output-ch
           :request-ch request-ch})))))
-
-;; (def x (bulk-chan (client)))
-;; (async/close! (:input-ch x))
-;; (async/close! (:request-ch x))
-;; (async/close! (:output-ch x))
-;; (async/put! (:input-ch x) {"delete" {"_index" "website" "_type" "blog" "_id" "123"}})
-;; (prn (async/<!! (:output-ch x)))
-
-;; (def c (client {:hosts ["localhost"]}))
-;; (def x (->> {:method :get :url "/asdf/" :body {:query {:crash {}}}
-;;              :exception-handler identity}
-;;             (request c)))
-
-;; (throw (ex-info "" {}))
-;; (->> {:method :get :url "" :body {:query {:crash {}}}} (request c))
-;; (prn (type *e))
