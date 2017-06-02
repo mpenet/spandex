@@ -232,7 +232,7 @@
   do whatever you'd like."
   [ex]
   (let [x (decode-exception ex)]
-    (if (instance? Throwable x)
+    (if (instance? Exception x)
       (throw x)
       x)))
 
@@ -263,8 +263,8 @@
          (encode-body body)
          (encode-headers headers))
         (response-decoder keywordize?))
-    (catch Throwable t
-      (exception-handler t))))
+    (catch Exception e
+      (exception-handler e))))
 
 (defn request-async
   "Similar to `qbits.spandex/request` but returns immediately and works
@@ -303,8 +303,8 @@
                                                keywordize?
                                                exception-handler)
                             (encode-headers headers)))
-    (catch Throwable t
-      (exception-handler t))))
+    (catch Exception e
+      (exception-handler e))))
 
 (defn request-chan
   "Similar to `qbits.spandex/request` but runs asynchronously and
@@ -321,8 +321,8 @@
                             :error (fn [ex]
                                      (async/put! ch ex)
                                      (async/close! ch))))
-      (catch Throwable t
-        (async/put! ch t)
+      (catch Exception e
+        (async/put! ch e)
         (async/close! ch)))
     ch))
 
@@ -358,7 +358,7 @@
                                                     :body (Raw. scroll-id)}))]
               (cond
                 ;; it's an error and we must exit the consuming process
-                (or (instance? Throwable response)
+                (or (instance? Exception response)
                     (not= 200 (:status response)))
                 (async/>! ch response)
 
@@ -485,3 +485,12 @@
 ;; (async/close! (:output-ch x))
 ;; (async/put! (:input-ch x) {"delete" {"_index" "website" "_type" "blog" "_id" "123"}})
 ;; (prn (async/<!! (:output-ch x)))
+
+;; (def c (client {:hosts ["localhost"]}))
+;; (def x (->> {:method :get :url "/asdf/" :body {:query {:crash {}}}
+;;              :exception-handler identity}
+;;             (request c)))
+
+;; (throw (ex-info "" {}))
+;; (->> {:method :get :url "" :body {:query {:crash {}}}} (request c))
+;; (prn (type *e))
