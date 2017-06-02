@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.11
+
+* Swap use of Throwable to Exception (thx @axel-angel)
+
 ## 0.3.10
 
 * bulk-chan: if the user closes :input-ch to signal the need to end
