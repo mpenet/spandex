@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.0
+
+* proper content-type defaults to prevent warnings with ES 5.3+
+
+* request-chan now accepts a `:ch` option which defaults to the
+  original `promise-chan` returned by the function.
+
 ## 0.3.11
 
 * Swap use of Throwable to Exception (thx @axel-angel)
