@@ -310,20 +310,18 @@
   "Similar to `qbits.spandex/request` but runs asynchronously and
   returns a `core.async/promise-chan` that will have the result (or
   error) delivered upon reception"
-  [^RestClient client options]
-  (let [ch (async/promise-chan)]
+  [^RestClient client {:as options
+                       :keys [ch]}]
+  (let [ch (or ch (async/promise-chan))]
     (try
       (request-async client
                      (assoc options
                             :success (fn [response]
-                                       (async/put! ch response)
-                                       (async/close! ch))
+                                       (async/put! ch response))
                             :error (fn [ex]
-                                     (async/put! ch ex)
-                                     (async/close! ch))))
+                                     (async/put! ch ex))))
       (catch Exception e
-        (async/put! ch e)
-        (async/close! ch)))
+        (async/put! ch e)))
     ch))
 
 (defn scroll-chan
