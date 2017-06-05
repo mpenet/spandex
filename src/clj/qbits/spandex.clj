@@ -160,9 +160,9 @@
   [headers]
   (->> headers
        (conj default-headers)
-       (into-array Header
-                   (map (fn [[k v]]
-                          (BasicHeader. (name k) v))))))
+       (map (fn [[k v]]
+              (BasicHeader. (name k) v)))
+       (into-array Header)))
 
 (defn ^:no-doc response-headers
   [^org.elasticsearch.client.Response response]
