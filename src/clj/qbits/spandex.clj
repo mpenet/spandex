@@ -154,12 +154,15 @@
   nil
   (encode-body [x] nil))
 
+(def default-headers {"Content-Type" "application/json"})
+
 (defn ^:no-doc encode-headers
   [headers]
-  (into-array Header
-              (map (fn [[k v]]
-                     (BasicHeader. (name k) v))
-                   headers)))
+  (->> headers
+       (conj default-headers)
+       (into-array Header
+                   (map (fn [[k v]]
+                          (BasicHeader. (name k) v))))))
 
 (defn ^:no-doc response-headers
   [^org.elasticsearch.client.Response response]
