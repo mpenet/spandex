@@ -383,11 +383,6 @@
           chunks)
     (-> sb .toString Raw.)))
 
-;; (def x (client ))
-;; (def s (sniffer x))
-;; (request x {:url "entries/entry/search" :method :get :body {} :exception-handler decoding-exception-handler})
-;; (async/<!! (request-ch x {:url "/entries/entry" :method :post :body {:foo "bar"}} ))
-
 (def bulk-chan
   "Bulk-chan takes a client, a partial request/option map, returns a
   map of :input-ch :output-ch. :input-ch is a channel that will accept
