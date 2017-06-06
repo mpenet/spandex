@@ -154,7 +154,7 @@
   nil
   (encode-body [x] nil))
 
-(def default-headers {"Content-Type" "application/json"})
+(def default-headers {"Content-Type" "application/json; charset=UTF8"})
 
 (defn ^:no-doc encode-headers
   [headers]
