@@ -60,23 +60,24 @@ Not to mention it supports some interesting features:
 
 #### Constructing URLs
 
-Optionally, you can use small convenience function to construct URLs out of
-your indices, types, IDs etc. for the client.
+Most of spandex request functions take a request map as parameter. The
+`:url` key differs a bit from the original RING spec, it allows to
+pass a raw string but also a sequence (potentially 2d) of encodable
+things, keywords, .toString'able objects that make sense or nil (which
+could be caused by a missing :url key).
 
-```clojure
-(require '[qbits.spandex.utils :as s-utils])
-
-(s-utils/url ["entries" "entry" "_search"])
->> "/entries/entry/_search"
-
-(s-utils/url [:entries [:entry :others] :_search])
->> "/entries/entry,others/_search"
+``` clojure
+(s/request c {:url [:foo :bar :_search] ...})
+(s/request c {:url [:foo [:bar :something "more"] :_search] ...})
+(s/request c {:url :_search ...})
+(s/request c {:url "/index/_search" ...})
+(s/request c {:url (java.util.UUID/randomUUID) ...})
+(s/request c {...}) ;; defaults to "/"
 ```
-
 ### Blocking requests
 
 ```clojure
-(s/request c {:url (s-utils/url [:entries :entry :_search])
+(s/request c {:url [:entries :entry :_search]
               :method :get
               :body {:query {:match_all {}}}})
 

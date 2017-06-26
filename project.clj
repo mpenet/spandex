@@ -1,5 +1,5 @@
-(def es-client-version "5.4.0")
-(defproject cc.qbits/spandex "0.4.2"
+(def es-client-version "5.4.2")
+(defproject cc.qbits/spandex "0.5.0"
   :description "Clojure Wrapper of the new/official ElasticSearch REST client"
   :url "https://github.com/mpenet/spandex"
   :license {:name "Eclipse Public License"
@@ -9,7 +9,7 @@
                  [org.elasticsearch.client/rest ~es-client-version]
                  [org.elasticsearch.client/sniffer ~es-client-version]
                  [cc.qbits/commons "0.4.6"]
-                 [cheshire "5.7.0"]]
+                 [cheshire "5.7.1"]]
   :source-paths ["src/clj"]
   :global-vars {*warn-on-reflection* true}
   :codox {:source-uri "https://github.com/mpenet/spandex/blob/master/{filepath}#L{line}"

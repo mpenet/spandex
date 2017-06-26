@@ -1,5 +1,32 @@
 # Changelog
 
+## 0.5.0
+
+* `:url` key in request-maps is not protocolized, as a result all
+  request functions now accept the request `:url` key as String or
+  Keyword or Sequential (potentially 2d), the same way
+  `qbits.spandex.utils/url` used to work in that case.
+
+  you can now write:
+  `(request client {:url "/foo" ...})`
+  `(request client {:url :foo ...})`
+  `(request client {:url [:foo :bar "baz"] ...})`
+  `(request client {:url [:foo [:bar :baz "prout"]] ...})`
+
+* depreciated `qbits.spandex.utils/url`. It now lives under
+  `qbits.spandex.url/encode`, there's an alias so it should be
+  backward compatible.
+
+* bump cheshire and elasticsearch client dependency
+
+## 0.4.2
+
+* specify utf-8 charset in content-type header
+
+## 0.4.1
+
+* bump clj + core.async deps
+
 ## 0.4.0
 
 * proper content-type defaults to prevent warnings with ES 5.3+

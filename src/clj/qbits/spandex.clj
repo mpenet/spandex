@@ -4,6 +4,7 @@
    [qbits.spandex.client-options :as client-options]
    [qbits.spandex.sniffer-options :as sniffer-options]
    [qbits.commons.enum :as enum]
+   [qbits.spandex.url :as url]
    [cheshire.core :as json]
    [clojure.string :as str]
    [clojure.java.io :as io])
@@ -261,7 +262,7 @@
     (-> client
         (.performRequest
          (name method)
-         url
+         (url/encode url)
          (encode-query-string query-string)
          (encode-body body)
          (encode-headers headers))
@@ -287,7 +288,7 @@
     (if response-consumer-factory
       (.performRequestAsync client
                             (name method)
-                            url
+                            (url/encode url)
                             (encode-query-string query-string)
                             (encode-body body)
                             response-consumer-factory
@@ -298,7 +299,7 @@
                             (encode-headers headers))
       (.performRequestAsync client
                             (name method)
-                            url
+                            (url/encode url)
                             (encode-query-string query-string)
                             (encode-body body)
                             (response-listener success

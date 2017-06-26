@@ -3,7 +3,7 @@
    [qbits.spandex]
    [clojure.spec.alpha :as s]
    [clojure.core.async :as async]
-   [qbits.spandex.utils])
+   [qbits.spandex.url])
   (:import
    (java.net InetAddress)
    (javax.net.ssl SSLContext)
@@ -103,7 +103,7 @@
                                   ::request/body
                                   ::request/exception-handler]))
 
-(s/def ::request/url string?)
+(s/def ::request/url #(satisfies? qbits.spandex.url/URL %))
 (s/def ::request/scheme #{:http :https})
 (s/def ::request/method #{:get :post :put :head})
 (s/def ::request/headers (s/map-of (s/or :kw keyword? :str string?)
@@ -182,7 +182,6 @@
         :ret (s/keys :req-un [::input-ch ::output-ch ::request-ch]))
 
 ;; utils
-(alias 'utils (create-ns 'qbits.spandex.spec.utils))
-(s/fdef qbits.spandex.utils/url
-        :args (s/cat :parts (s/* (s/nilable #(satisfies? qbits.spandex.utils/URLFragment %))))
+(s/fdef qbits.spandex.url/encode
+        :args (s/cat :parts (s/* (s/nilable #(satisfies? qbits.spandex.url/URLFragment %))))
         :ret string?)
