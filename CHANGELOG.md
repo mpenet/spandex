@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.1
+
+* fix bug with scroll_id parameter with ES 5.4 (they removed a
+  backward compat with raw param in body, body is assumed to be JSON.
+
 ## 0.5.0
 
 * `:url` key in request-maps is not protocolized, as a result all
