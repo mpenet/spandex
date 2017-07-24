@@ -74,7 +74,6 @@
           (get "_source")
           (= (clojure.walk/stringify-keys doc)))))
 
-
 (deftest test-head-req
   (is (-> (s/request client
                      {:url [index type doc-id]
@@ -96,7 +95,6 @@
                       :error (fn [response]
                                (deliver p response))})
     (is (contains? #{200 201} (:status @p)))))
-
 
 (deftest test-scrolling-chan
   (dotimes [i 99]

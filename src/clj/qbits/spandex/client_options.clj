@@ -85,7 +85,6 @@
   [_ ^RequestConfig$Builder builder target-preferred-auth-schemes]
   (.setTargetPreferredAuthSchemes builder target-preferred-auth-schemes))
 
-
 ;; http-client options
 (defmulti set-http-client-option! (fn [k builder option] k))
 
@@ -153,7 +152,7 @@
            (reduce (fn [builder [k option]]
                      (set-request-option! k builder option))
                    builder
-                 options))))))
+                   options))))))
 
 (defmethod set-option! :http-client
   [_ ^RestClientBuilder builder options]
