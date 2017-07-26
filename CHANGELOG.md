@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.2
+
+* Add chan->seq utility function
+
+* bump ES dep to 5.5.0
+
 ## 0.5.1
 
 * fix bug with scroll_id parameter with ES 5.4 (they removed a
