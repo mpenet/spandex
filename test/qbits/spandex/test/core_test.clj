@@ -1,5 +1,4 @@
 (ns qbits.spandex.test.core-test
-  (:refer-clojure :exclude [type])
   (:use clojure.test)
   (:require
    [clojure.core.async :as async]
@@ -8,16 +7,16 @@
   (:import (qbits.spandex Response)))
 
 (try
-  (require 'qbits.spandex.spec)
-  (require 'clojure.spec.test.alpha)
-  ((resolve 'clojure.spec.test.alpha/instrument))
+  ;; (require 'qbits.spandex.spec)
+  ;; (require 'clojure.spec.test.alpha)
+  ;; ((resolve 'clojure.spec.test.alpha/instrument))
   (println "Instrumenting qbits.spandex with clojure.spec")
   (catch Exception e
     (.printStackTrace e)))
 
 (def server "http://127.0.0.1:9200")
 (def index (java.util.UUID/randomUUID))
-(def type (java.util.UUID/randomUUID))
+(def doc-type (java.util.UUID/randomUUID))
 
 (def doc {:some {:fancy "thing"}})
 (def doc-id (java.util.UUID/randomUUID))
@@ -32,7 +31,7 @@
     (try
       (s/request client
                  {:method :delete
-                  :url [index type]})
+                  :url [index doc-type]})
       (catch Exception _ nil))
     (t)))
 
@@ -53,21 +52,21 @@
 
 (deftest test-sync-query
   (is (->> (s/request client
-                      {:url [index type doc-id]
+                      {:url [index doc-type doc-id]
                        :method :post
                        :body doc})
            :status
            (contains? #{200 201})))
 
   (is (-> (s/request client
-                     {:url [index type doc-id]
+                     {:url [index doc-type doc-id]
                       :method :get})
           :body
           :_source
           (= doc)))
 
   (is (-> (s/request client
-                     {:url [index type doc-id]
+                     {:url [index doc-type doc-id]
                       :method :get
                       :keywordize? false})
           :body
@@ -77,19 +76,19 @@
 
 (deftest test-head-req
   (is (-> (s/request client
-                     {:url [index type doc-id]
+                     {:url [index doc-type doc-id]
                       :method :head})
           :body
           nil?)))
 
 (deftest test-async-sync-query
   (s/request client
-             {:url [index type doc-id]
+             {:url [index doc-type doc-id]
               :method :post
               :body doc})
   (let [p (promise)]
     (s/request-async client
-                     {:url [index type doc-id]
+                     {:url [index doc-type doc-id]
                       :method :get
                       :success (fn [response]
                                  (deliver p response))
@@ -101,11 +100,11 @@
 (deftest test-scrolling-chan
   (dotimes [i 99]
     (s/request client
-               {:url [index type (str i)]
+               {:url [index doc-type (str i)]
                 :method :post
                 :body doc}))
   (wait!)
-  (let [ch (s/scroll-chan client {:url [index type :_search]})]
+  (let [ch (s/scroll-chan client {:url [index doc-type :_search]})]
     (-> (async/go
           (loop [docs []]
             (if-let [docs' (-> (async/<! ch) :body :hits :hits seq)]
@@ -119,11 +118,11 @@
 (deftest test-scrolling-chan-interupted
   (dotimes [i 99]
     (s/request client
-               {:url [index type (str i)]
+               {:url [index doc-type (str i)]
                 :method :post
                 :body doc}))
   (wait!)
-  (let [ch (s/scroll-chan client {:url [index type :_search]
+  (let [ch (s/scroll-chan client {:url [index doc-type :_search]
                                   :body {:size 1}})]
     (-> (async/go
           (loop [docs []

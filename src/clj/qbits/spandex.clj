@@ -9,11 +9,11 @@
    [clojure.string :as str]
    [clojure.java.io :as io])
   (:import
-   (org.elasticsearch.client.sniff
-    Sniffer
-    ElasticsearchHostsSniffer
-    ElasticsearchHostsSniffer$Scheme
-    SniffOnFailureListener)
+   ;; (org.elasticsearch.client.sniff
+   ;;  Sniffer
+   ;;  ElasticsearchHostsSniffer
+   ;;  ElasticsearchHostsSniffer$Scheme
+   ;;  SniffOnFailureListener)
    (org.elasticsearch.client
     RestClient
     ResponseListener
@@ -82,7 +82,7 @@
   ([options]
    (client-options/builder options)))
 
-(def ^:no-doc sniffer-scheme (enum/enum->fn ElasticsearchHostsSniffer$Scheme))
+(def ^:no-doc sniffer-scheme nil); (enum/enum->fn ElasticsearchHostsSniffer$Scheme))
 
 (defn sniffer
   "Takes a Client instance (and possible sniffer options) and returns
@@ -102,29 +102,30 @@
   extending the multimethod
   `qbits.spandex.sniffer-options/set-option!`"
   ([client]
-   (sniffer client nil))
-  ([client {:as options
-            :keys [scheme timeout]
-            :or {scheme :http
-                 timeout ElasticsearchHostsSniffer/DEFAULT_SNIFF_REQUEST_TIMEOUT}}]
-   (let [sniffer (ElasticsearchHostsSniffer. client
-                                             timeout
-                                             (sniffer-scheme scheme))]
-     (sniffer-options/builder client sniffer options))))
+   nil))
+  ;;  (sniffer client nil))
+  ;; ([client {:as options
+  ;;           :keys [scheme timeout]
+  ;;           :or {scheme :http
+  ;;                timeout ElasticsearchHostsSniffer/DEFAULT_SNIFF_REQUEST_TIMEOUT}}]
+  ;;  (let [sniffer (ElasticsearchHostsSniffer. client
+  ;;                                            timeout
+  ;;                                            (sniffer-scheme scheme))]
+  ;;    (sniffer-options/builder client sniffer options))))
 
-(defn set-sniff-on-failure!
-  "Register a SniffOnFailureListener that allows to perform sniffing
-  on failure."
-  [^Sniffer sniffer]
-  (doto (SniffOnFailureListener.)
-    (.setSniffer sniffer)))
+;; (defn set-sniff-on-failure!
+;;   "Register a SniffOnFailureListener that allows to perform sniffing
+;;   on failure."
+;;   [^Sniffer sniffer]
+;;   (doto (SniffOnFailureListener.)
+;;     (.setSniffer sniffer)))
 
 (defprotocol Closable
   (close! [this]))
 
 (extend-protocol Closable
-  Sniffer
-  (close! [sniffer] (.close sniffer))
+  ;; Sniffer
+  ;; (close! [sniffer] (.close sniffer))
   RestClient
   (close! [client] (.close client)))
 
@@ -182,12 +183,22 @@
              {}
              qs))
 
-(defn ^:no-doc json-entity?
+;; (defn ^:no-doc json-entity?
+;;   [^HttpEntity entity]
+;;   (some-> entity
+;;            .getContentType
+;;            .getValue
+;;            (str/index-of "application/json")))
+
+(defn ^:no-doc json-entity-new?
   [^HttpEntity entity]
-  (some-> entity
-          .getContentType
-          .getValue
-          (str/index-of "application/json")))
+  (when-let [idx (some-> entity
+                         .getContentType
+                         .getValue
+                         (.indexOf "application/json"))]
+    (if (< idx 0)
+      nil
+      idx)))
 
 (defn ^:no-doc response-status
   [^org.elasticsearch.client.Response response]
@@ -200,7 +211,7 @@
   (let [entity (.getEntity response)
         content (when entity (.getContent entity))]
     (Response. (when entity
-                 (if (json-entity? entity)
+                 (if (json-entity-new? entity)
                    (-> content io/reader (json/parse-stream keywordize?))
                    (slurp content)))
                (response-status response)
@@ -373,15 +384,29 @@
         (async/close! ch)))
     ch))
 
+;; (defn chunks->body
+;;   "Utility function to create _bulk/_msearch bodies. It takes a
+;;   sequence of clj fragments and returns a newline delimited string of
+;;   JSON fragments"
+;;   [chunks]
+;;   (let [sb (StringBuilder.)]
+;;     (run! #(do (.append sb (json/generate-string %))
+;;                (.append sb "\n"))
+;;           chunks)
+;;     (-> sb .toString Raw.)))
+
 (defn chunks->body
   "Utility function to create _bulk/_msearch bodies. It takes a
   sequence of clj fragments and returns a newline delimited string of
   JSON fragments"
   [chunks]
   (let [sb (StringBuilder.)]
-    (run! #(do (.append sb (json/generate-string %))
-               (.append sb "\n"))
-          chunks)
+    (doseq [c chunks]
+      (.append sb (json/generate-string c))
+      (.append sb "\n"))
+    ;; (run! #(do (.append sb (json/generate-string %))
+    ;;            (.append sb "\n"))
+    ;;      chunks)
     (-> sb .toString Raw.)))
 
 (def bulk-chan

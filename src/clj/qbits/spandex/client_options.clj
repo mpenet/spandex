@@ -18,9 +18,9 @@
     RestClient
     RestClientBuilder
     RestClientBuilder$RequestConfigCallback
-    RestClientBuilder$HttpClientConfigCallback)
-   (org.elasticsearch.client.sniff
-    SniffOnFailureListener)))
+    RestClientBuilder$HttpClientConfigCallback)))
+   ;; (org.elasticsearch.client.sniff
+   ;;  SniffOnFailureListener)))
 
 ;; request opts
 (defmulti set-request-option! (fn [k builder option] k))
@@ -168,12 +168,12 @@
                    builder
                    options))))))
 
-(defmethod set-option! :sniff-on-failure
-  [_ ^RestClientBuilder builder sniffer]
-  (let [listener (SniffOnFailureListener.)]
-    (set-option! :failure-listener builder listener)
-    (.setSniffer listener sniffer))
-  builder)
+;; (defmethod set-option! :sniff-on-failure
+;;   [_ ^RestClientBuilder builder sniffer]
+;;   (let [listener (SniffOnFailureListener.)]
+;;     (set-option! :failure-listener builder listener)
+;;     (.setSniffer listener sniffer))
+;;   builder)
 
 (defmethod set-option! :failure-listener
   [_ ^RestClientBuilder builder failure-listener]
