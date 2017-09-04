@@ -17,5 +17,7 @@
           :output-path "docs"
           :doc-files ["docs/quickstart.md"]
           :source-paths ["src/clj"]}
-  :profiles {:dev {:plugins [[lein-cljfmt "0.5.6"]
+  :pedantic? :abort
+  :profiles {:dev {:plugins [[lein-cljfmt "0.5.6"
+                              :exclusions [org.clojure/clojurescript]]
                              [codox "0.10.3"]]}})
