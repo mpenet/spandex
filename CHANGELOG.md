@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.3
+
+* bump ES dep to 5.5.0
+
 ## 0.5.2
 
 * Add chan->seq utility function
