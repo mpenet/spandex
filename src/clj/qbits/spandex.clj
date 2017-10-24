@@ -28,7 +28,9 @@
    (org.apache.http.entity
     InputStreamEntity)
    (java.nio.charset
-    StandardCharsets)))
+    StandardCharsets)
+   (java.util.zip
+    GZIPInputStream)))
 
 (defn client
   "Returns a client instance to be used to perform requests.
@@ -189,6 +191,13 @@
           .getValue
           (str/index-of "application/json")))
 
+(defn ^:no-doc gzipped-entity?
+   [^HttpEntity entity]
+   (some-> entity
+           .getContentEncoding
+           .getValue
+           (str/index-of "gzip")))
+
 (defn ^:no-doc response-status
   [^org.elasticsearch.client.Response response]
   (some-> response .getStatusLine .getStatusCode))
@@ -199,10 +208,13 @@
   [^org.elasticsearch.client.Response response keywordize?]
   (let [entity (.getEntity response)
         content (when entity (.getContent entity))]
-    (Response. (when entity
-                 (if (json-entity? entity)
-                   (-> content io/reader (json/parse-stream keywordize?))
-                   (slurp content)))
+    (Response. (when content
+                 (let [content (cond-> content
+                                 (gzipped-entity? entity)
+                                 (GZIPInputStream.))]
+                   (if (json-entity? entity)
+                     (-> content io/reader (json/parse-stream keywordize?))
+                     (slurp content))))
                (response-status response)
                (response-headers response)
                (.getHost response))))
