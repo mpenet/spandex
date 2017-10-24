@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.4
+
+* properly decompress body when returned as gzipped content. thx to
+  @ahjones for the report and first patch
+
 ## 0.5.3
 
 * bump ES dep to 5.5.0
