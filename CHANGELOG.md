@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.5
+
+* properly url-encode url fragments when passing url as data
+* update deps: core.async, clojure, es rest client, cheshire
+
 ## 0.5.4
 
 * properly decompress body when returned as gzipped content. thx to

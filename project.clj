@@ -7,9 +7,10 @@
   :dependencies [[org.clojure/clojure "1.9.0-RC2"]
                  [org.clojure/core.async "0.3.465"]
                  [org.elasticsearch.client/rest ~es-client-version]
-                 [org.elasticsearch.client/sniffer ~es-client-version]
+                 [org.elasticsearch.client/sniffer ~es-client-version
+                   :exclusions [com.fasterxml.jackson.core/jackson-core]]
                  [cc.qbits/commons "0.4.6"]
-                 [cheshire "5.7.1"]
+                 [cheshire "5.8.0"]
                  [ring/ring-codec "1.1.0"]]
   :source-paths ["src/clj"]
   :global-vars {*warn-on-reflection* true}

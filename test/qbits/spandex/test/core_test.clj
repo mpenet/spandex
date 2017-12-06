@@ -23,6 +23,7 @@
 (def doc {:some {:fancy "thing"}})
 (def doc-id (java.util.UUID/randomUUID))
 (def client (s/client))
+(def sniffer (s/sniffer client))
 
 (defn wait! []
   (Thread/sleep 3000))
