@@ -42,6 +42,7 @@
   (is (= (url/encode [:foo 1 nil "bar" nil]) "/foo/1/bar"))
   (is (= (url/encode [:foo 1 ["bar" :baz 2]]) "/foo/1/bar,baz,2"))
   (is (= (url/encode [:foo 1 ["bar" nil :baz nil 2]]) "/foo/1/bar,baz,2"))
+  (is (= (url/encode [:foo 1 "bar baz"]) "/foo/1/bar%20baz"))
   (is (= (url/encode []) "/"))
   (is (= (url/encode "/") "/"))
   (is (= (url/encode "/foo") "/foo"))

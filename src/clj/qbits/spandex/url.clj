@@ -1,4 +1,6 @@
-(ns qbits.spandex.url)
+(ns qbits.spandex.url
+  (:require
+   [ring.util.codec :as codec]))
 
 (declare x-fragment-interpose-comma
          x-fragment-interpose-slash)
@@ -26,13 +28,16 @@
     (transduce x-fragment-interpose-comma string-builder value))
 
   clojure.lang.Keyword
-  (encode-fragment [value] (name value))
+  (encode-fragment [value]
+    (encode-fragment (name value)))
 
   String
-  (encode-fragment [s] s)
+  (encode-fragment [s]
+    (codec/url-encode s))
 
   Object
-  (encode-fragment [value] (str value)))
+  (encode-fragment [value]
+    (encode-fragment (str value))))
 
 (def ^:no-doc x-fragment-interpose-comma
   (comp (remove nil?)
