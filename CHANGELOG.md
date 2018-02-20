@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.0
+
+* bump ES dep to 6.2.1
+
 ## 0.5.5
 
 * properly url-encode url fragments when passing url as data
