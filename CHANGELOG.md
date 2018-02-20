@@ -3,6 +3,8 @@
 ## 0.6.0
 
 * bump ES dep to 6.2.1
+* bump clojure to 1.9 final
+* bump core.async to latest
 
 ## 0.5.5
 
