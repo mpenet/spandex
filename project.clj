@@ -1,4 +1,4 @@
-(def es-client-version "6.0.0-alpha2")
+(def es-client-version "6.2.1")
 (defproject cc.qbits/spandex "0.5.5"
   :description "Clojure Wrapper of the new/official ElasticSearch REST client"
   :url "https://github.com/mpenet/spandex"
@@ -6,8 +6,8 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.9.0-RC2"]
                  [org.clojure/core.async "0.3.465"]
-                 [org.elasticsearch.client/rest ~es-client-version]
-                 [org.elasticsearch.client/sniffer ~es-client-version
+                 [org.elasticsearch.client/elasticsearch-rest-client ~es-client-version]
+                 [org.elasticsearch.client/elasticsearch-rest-client-sniffer ~es-client-version
                    :exclusions [com.fasterxml.jackson.core/jackson-core]]
                  [cc.qbits/commons "0.4.6"]
                  [cheshire "5.8.0"]
