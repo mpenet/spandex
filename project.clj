@@ -4,8 +4,8 @@
   :url "https://github.com/mpenet/spandex"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[org.clojure/clojure "1.9.0-RC2"]
-                 [org.clojure/core.async "0.3.465"]
+  :dependencies [[org.clojure/clojure "1.9.0"]
+                 [org.clojure/core.async "0.4.474"]
                  [org.elasticsearch.client/elasticsearch-rest-client ~es-client-version]
                  [org.elasticsearch.client/elasticsearch-rest-client-sniffer ~es-client-version
                    :exclusions [com.fasterxml.jackson.core/jackson-core]]
