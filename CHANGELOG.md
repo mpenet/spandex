@@ -1,5 +1,16 @@
 # Changelog
 
+
+## 0.6.2
+
+* bump ES dep to 6.2.1
+* make response consumer factory configurable in sync requests and
+  refactor related code a bit
+
+## 0.6.1
+
+* bump qbits.commons
+
 ## 0.6.0
 
 * bump ES dep to 6.2.1
