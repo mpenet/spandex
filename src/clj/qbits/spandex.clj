@@ -17,6 +17,7 @@
    (org.elasticsearch.client
     RestClient
     ResponseListener
+    HttpAsyncResponseConsumerFactory
     ResponseException)
    (org.apache.http
     Header
@@ -269,27 +270,19 @@
                               exception-handler]
                        :or {method :get
                             keywordize? true
-                            exception-handler default-exception-handler}
+                            exception-handler default-exception-handler
+                            response-consumer-factory HttpAsyncResponseConsumerFactory/DEFAULT}
                        :as request-params}]
   (try
-    (if response-consumer-factory
-      (-> client
-          (.performRequest
-           (name method)
-           (url/encode url)
-           (encode-query-string query-string)
-           (encode-body body)
-           response-consumer-factory
-           (encode-headers headers))
-          (response-decoder keywordize?))
-      (-> client
-          (.performRequest
-           (name method)
-           (url/encode url)
-           (encode-query-string query-string)
-           (encode-body body)
-           (encode-headers headers))
-          (response-decoder keywordize?)))
+    (-> client
+        (.performRequest
+         (name method)
+         (url/encode url)
+         (encode-query-string query-string)
+         (encode-body body)
+         response-consumer-factory
+         (encode-headers headers))
+        (response-decoder keywordize?))
     (catch Exception e
       (exception-handler e))))
 
@@ -304,32 +297,21 @@
            exception-handler]
     :or {method :get
          keywordize? true
-         exception-handler decode-exception}
+         exception-handler decode-exception
+         response-consumer-factory HttpAsyncResponseConsumerFactory/DEFAULT}
     :as request-params}]
-  ;; eeek we can prolly avoid duplication here
   (try
-    (if response-consumer-factory
-      (.performRequestAsync client
-                            (name method)
-                            (url/encode url)
-                            (encode-query-string query-string)
-                            (encode-body body)
-                            response-consumer-factory
-                            (response-listener success
-                                               error
-                                               keywordize?
-                                               exception-handler)
-                            (encode-headers headers))
-      (.performRequestAsync client
-                            (name method)
-                            (url/encode url)
-                            (encode-query-string query-string)
-                            (encode-body body)
-                            (response-listener success
-                                               error
-                                               keywordize?
-                                               exception-handler)
-                            (encode-headers headers)))
+    (.performRequestAsync client
+                          (name method)
+                          (url/encode url)
+                          (encode-query-string query-string)
+                          (encode-body body)
+                          response-consumer-factory
+                          (response-listener success
+                                             error
+                                             keywordize?
+                                             exception-handler)
+                          (encode-headers headers))
     (catch Exception e
       (exception-handler e))))
 
@@ -442,15 +424,15 @@
                   (recur)
                   (async/close! out-ch)))))
           (build-map [request-map payload]
-                     (assoc request-map
-                            :body
-                            (->> payload
-                                 (reduce (fn [payload chunk]
-                                           (if (sequential? chunk)
-                                             (concat payload chunk)
-                                             (conj payload chunk)))
-                                         [])
-                                 chunks->body)))]
+            (assoc request-map
+                   :body
+                   (->> payload
+                        (reduce (fn [payload chunk]
+                                  (if (sequential? chunk)
+                                    (concat payload chunk)
+                                    (conj payload chunk)))
+                                [])
+                        chunks->body)))]
     (fn bulk-chan
       ([client] (bulk-chan client {}))
       ([client {:as request-map
@@ -475,8 +457,8 @@
                    #(request-chan client (build-map request-map %))
                    max-concurrent-requests)
          (async/go-loop
-          [payload []
-           timeout-ch (async/timeout flush-interval)]
+             [payload []
+              timeout-ch (async/timeout flush-interval)]
            (let [[chunk ch] (async/alts! [timeout-ch input-ch])]
              (cond
                (= timeout-ch ch)
