@@ -192,11 +192,11 @@
           (str/index-of "application/json")))
 
 (defn ^:no-doc gzipped-entity?
-   [^HttpEntity entity]
-   (some-> entity
-           .getContentEncoding
-           .getValue
-           (str/index-of "gzip")))
+  [^HttpEntity entity]
+  (some-> entity
+          .getContentEncoding
+          .getValue
+          (str/index-of "gzip")))
 
 (defn ^:no-doc response-status
   [^org.elasticsearch.client.Response response]
@@ -265,20 +265,31 @@
 (defn request
   [^RestClient client {:keys [method url headers query-string body
                               keywordize?
+                              response-consumer-factory
                               exception-handler]
                        :or {method :get
                             keywordize? true
                             exception-handler default-exception-handler}
                        :as request-params}]
   (try
-    (-> client
-        (.performRequest
-         (name method)
-         (url/encode url)
-         (encode-query-string query-string)
-         (encode-body body)
-         (encode-headers headers))
-        (response-decoder keywordize?))
+    (if response-consumer-factory
+      (-> client
+          (.performRequest
+           (name method)
+           (url/encode url)
+           (encode-query-string query-string)
+           (encode-body body)
+           response-consumer-factory
+           (encode-headers headers))
+          (response-decoder keywordize?))
+      (-> client
+          (.performRequest
+           (name method)
+           (url/encode url)
+           (encode-query-string query-string)
+           (encode-body body)
+           (encode-headers headers))
+          (response-decoder keywordize?)))
     (catch Exception e
       (exception-handler e))))
 
