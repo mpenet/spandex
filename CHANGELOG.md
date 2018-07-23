@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.4
+
+* bump dependencies
+
+* kill deprecated request decompression param
+
 ## 0.6.3 - Breaking change
 
 * fix bug in scroll-chan where request-chan and scroll chan output
