@@ -57,7 +57,6 @@
       *  `:connect-timeout`
       *  `:connection-request-timeout`
       *  `:content-compression?`
-      *  `:decompression?`
       *  `:expect-continue?`
       *  `:local-address`
       *  `:max-redirects`

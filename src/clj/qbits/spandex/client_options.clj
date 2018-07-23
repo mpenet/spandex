@@ -49,10 +49,6 @@
   [_ ^RequestConfig$Builder builder cookie-spec]
   (.setCookieSpec builder cookie-spec))
 
-(defmethod set-request-option! :decompression?
-  [_ ^RequestConfig$Builder builder decompression?]
-  (.setDecompressionEnabled builder (boolean decompression?)))
-
 (defmethod set-request-option! :expect-continue?
   [_ ^RequestConfig$Builder builder expect-continue?]
   (.setExpectContinueEnabled builder (boolean expect-continue?)))
