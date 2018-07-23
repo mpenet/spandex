@@ -62,7 +62,6 @@
                    ::request-options/connect-request-timeout
                    ::request-options/content-compression?
                    ::request-options/cookie-spec
-                   ::request-options/decompression?
                    ::request-options/expect-continue?
                    ::request-options/local-address
                    ::request-options/cookie-spec
@@ -75,7 +74,6 @@
 (s/def ::request-options/authentication? boolean?)
 (s/def ::request-options/circular-redirect-allowed? boolean?)
 (s/def ::request-options/content-compression? boolean?)
-(s/def ::request-options/decompression? boolean?)
 (s/def ::request-options/expect-continue? boolean?)
 (s/def ::request-options/redirect? boolean?)
 (s/def ::request-options/relative-redirects-allowed? boolean?)
