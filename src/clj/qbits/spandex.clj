@@ -342,12 +342,12 @@
   it'll default to 1m.  The chan will be closed once scroll is
   complete. If you must stop scrolling before that, you must
   async/close! manually, this will release all used resources. You can
-  also supply a :ch key to the request map, a core.async/chan that
+  also supply a :output-ch key to the request map, a core.async/chan that
   will receive the results. This allow you to have custom buffers, or
   have multiple scroll-chan calls feed the same channel instance"
-  [client {:as request-map :keys [ttl ch]
+  [client {:as request-map :keys [ttl output-ch]
            :or {ttl "1m"}}]
-  (let [ch (or ch (async/chan))]
+  (let [ch (or output-ch (async/chan))]
     (async/go
       (let [response
             (async/<! (request-chan client
@@ -404,7 +404,7 @@
   :output-ch will allow you to inspect [job responses] the server
   returned and handle potential errors/failures accordingly (retrying
   etc). If you close! the :input-ch it will close the underlying
-  resources and exit cleanly (comsumming all jobs that remain in
+  resources and exit cleanly (consuming all jobs that remain in
   queues). By default requests are run against _bulk, but the option
   map is passed as is to request-chan, you can overwrite options here
   and provide your own url, headers and so on."
