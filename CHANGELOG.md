@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.3 - Breaking change
+
+* fix bug in scroll-chan where request-chan and scroll chan output
+  chan would be mixed up if the user passed a :ch option.  scroll-chan
+  output chan is now called `:ouput-ch`, same as `bulk-chan`.
+
 
 ## 0.6.2
 
