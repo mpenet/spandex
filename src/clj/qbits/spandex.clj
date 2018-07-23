@@ -424,15 +424,15 @@
                   (recur)
                   (async/close! out-ch)))))
           (build-map [request-map payload]
-            (assoc request-map
-                   :body
-                   (->> payload
-                        (reduce (fn [payload chunk]
-                                  (if (sequential? chunk)
-                                    (concat payload chunk)
-                                    (conj payload chunk)))
-                                [])
-                        chunks->body)))]
+                     (assoc request-map
+                            :body
+                            (->> payload
+                                 (reduce (fn [payload chunk]
+                                           (if (sequential? chunk)
+                                             (concat payload chunk)
+                                             (conj payload chunk)))
+                                         [])
+                                 chunks->body)))]
     (fn bulk-chan
       ([client] (bulk-chan client {}))
       ([client {:as request-map
@@ -457,8 +457,8 @@
                    #(request-chan client (build-map request-map %))
                    max-concurrent-requests)
          (async/go-loop
-             [payload []
-              timeout-ch (async/timeout flush-interval)]
+          [payload []
+           timeout-ch (async/timeout flush-interval)]
            (let [[chunk ch] (async/alts! [timeout-ch input-ch])]
              (cond
                (= timeout-ch ch)
