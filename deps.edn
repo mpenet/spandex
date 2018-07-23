@@ -1,0 +1,21 @@
+{:deps
+ {org.clojure/clojure {:mvn/version "1.9.0"}
+  org.clojure/core.async {:mvn/version "0.4.474"}
+  org.elasticsearch.client/elasticsearch-rest-client
+  {:mvn/version "6.3.1"
+   ;; more recent through ring/ring-codec
+   :exclusions [commons-codec]}
+  org.elasticsearch.client/elasticsearch-rest-client-sniffer
+  {:mvn/version "6.3.1"
+   :exclusions [com.fasterxml.jackson.core/jackson-core
+                commons-codec]}
+  cc.qbits/commons {:mvn/version "0.5.1"}
+  cheshire {:mvn/version "5.8.0"}
+  ring/ring-codec {:mvn/version "1.1.1"}}
+
+ :paths ["src/clj"]
+
+ :aliases {:test {:extra-paths ["test"]
+                  :extra-deps {com.cognitect/test-runner {:git/url "https://github.com/cognitect-labs/test-runner.git"
+                                                          :sha "5fb4fc46ad0bf2e0ce45eba5b9117a2e89166479"}}
+                  :main-opts ["-m" "cognitect.test-runner"]}}}
