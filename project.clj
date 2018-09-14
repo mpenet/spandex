@@ -23,6 +23,6 @@
           :doc-files ["docs/quickstart.md"]
           :source-paths ["src/clj"]}
   :pedantic? :warn
-  :profiles {:dev {:plugins [[lein-cljfmt "0.6.0"
+  :profiles {:dev {:plugins [[lein-cljfmt "0.6.1"
                               :exclusions [org.clojure/clojurescript]]
                              [codox "0.10.4"]]}})
