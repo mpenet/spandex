@@ -18,4 +18,10 @@
  :aliases {:test {:extra-paths ["test"]
                   :extra-deps {com.cognitect/test-runner {:git/url "https://github.com/cognitect-labs/test-runner.git"
                                                           :sha "5fb4fc46ad0bf2e0ce45eba5b9117a2e89166479"}}
-                  :main-opts ["-m" "cognitect.test-runner"]}}}
+                  :main-opts ["-m" "cognitect.test-runner"]}
+           :cljfmt {:extra-deps {com.jameslaverack/cljfmt-runner {:git/url "https://github.com/JamesLaverack/cljfmt-runner"
+                                                                  :sha "fc12c2724c44185cd1b221a79c8486c73846f14c"
+                                                                  :exclusions [cljfmt]}
+                                 cljfmt {:mvn/version "0.6.1"}}
+                    :main-opts ["-m" "cljfmt-runner.check"]}
+           :cljfmt/fix {:main-opts ["-m" "cljfmt-runner.fix"]}}}

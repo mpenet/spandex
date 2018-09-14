@@ -139,29 +139,29 @@
 (s/def ::error fn?) ;; refine
 
 (s/fdef qbits.spandex/request
-        :args (s/cat :client ::client
-                     :options ::request)
-        :ret ::response)
+  :args (s/cat :client ::client
+               :options ::request)
+  :ret ::response)
 
 (s/fdef qbits.spandex/request-async
-        :args (s/cat :client ::client
-                     :options ::request-async))
+  :args (s/cat :client ::client
+               :options ::request-async))
 
 (s/fdef qbits.spandex/request-chan
-        :args (s/cat :client ::client
-                     :options ::request-async)
-        :ret ::chan)
+  :args (s/cat :client ::client
+               :options ::request-async)
+  :ret ::chan)
 
 (s/fdef qbits.spandex/chunks->body
-        :args (s/cat :fragments (s/coll-of map?))
-        :ret string?)
+  :args (s/cat :fragments (s/coll-of map?))
+  :ret string?)
 
 (s/def ::ttl int?)
 (s/def ::ch int?)
 (s/fdef qbits.spandex/scroll-chan
-        :args (s/cat :client ::client
-                     :options (s/and ::request (s/keys :opt-un [::ttl ::ch])))
-        :ret ::chan)
+  :args (s/cat :client ::client
+               :options (s/and ::request (s/keys :opt-un [::ttl ::ch])))
+  :ret ::chan)
 
 (s/def ::input-ch ::chan)
 (s/def ::output-ch ::chan)
@@ -176,16 +176,16 @@
                                                    ::flush-interval
                                                    ::max-concurrent-requests])))
 (s/fdef qbits.spandex/bulk-chan
-        :args (s/cat :client ::client
-                     :options ::bulk-chan-options)
-        :ret (s/keys :req-un [::input-ch ::output-ch ::request-ch]))
+  :args (s/cat :client ::client
+               :options ::bulk-chan-options)
+  :ret (s/keys :req-un [::input-ch ::output-ch ::request-ch]))
 
 ;; utils
 (s/fdef qbits.spandex.url/encode
-        :args (s/cat :parts (s/* (s/nilable #(satisfies? qbits.spandex.url/URLFragment %))))
-        :ret string?)
+  :args (s/cat :parts (s/* (s/nilable #(satisfies? qbits.spandex.url/URLFragment %))))
+  :ret string?)
 
 (s/fdef qbits.spandex.utils/chan->seq
-        :args (s/cat :chan ::chan)
-        :ret (s/nilable (s/coll-of (s/or :response ::response
-                                         :exception #(instance? Exception %)))))
+  :args (s/cat :chan ::chan)
+  :ret (s/nilable (s/coll-of (s/or :response ::response
+                                   :exception #(instance? Exception %)))))
