@@ -143,6 +143,11 @@ request-chan internally, so it's quite cheap.
 
 Or the [clj.specs](https://github.com/mpenet/spandex/blob/master/src/clj/qbits/spandex/spec.clj) if that's your thing:
 
+## Patreon
+
+If you wish to support the work on this project you can do this via my
+[patreon](https://www.patreon.com/mpenet) page.
+
 ## License
 
 Copyright © 2017 [Max Penet](http://twitter.com/mpenet)
