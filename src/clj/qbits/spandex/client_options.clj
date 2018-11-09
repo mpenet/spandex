@@ -174,6 +174,10 @@
   [_ ^RestClientBuilder builder failure-listener]
   (-> builder (.setFailureListener failure-listener)))
 
+(defmethod set-option! :node-selector
+  [_ ^RestClientBuilder builder node-selector]
+  (.setNodeSelector builder node-selector))
+
 (defmethod set-option! :default
   [_ ^RestClientBuilder b x]
   b)

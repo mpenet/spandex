@@ -15,6 +15,7 @@
     ElasticsearchNodesSniffer$Scheme
     SniffOnFailureListener)
    (org.elasticsearch.client
+    NodeSelector
     Request
     RequestOptions
     RequestOptions$Builder
@@ -123,6 +124,14 @@
   [^Sniffer sniffer]
   (doto (SniffOnFailureListener.)
     (.setSniffer sniffer)))
+
+(defn node-selector
+  "Creates a NodeSelector instance that will call `f` as select():
+  see: https://github.com/elastic/elasticsearch/blob/master/client/rest/src/main/java/org/elasticsearch/client/NodeSelector.java#L29"
+  [f]
+  (reify NodeSelector
+    (select [this nodes]
+      (f nodes))))
 
 (defprotocol Closable
   (close! [this]))
@@ -488,6 +497,3 @@
          {:input-ch input-ch
           :output-ch output-ch
           :request-ch request-ch})))))
-
-;; (def c (client {:hosts ["http://0.0.0.0:9200"]}))
-;; (request c {:url "_stats"})
