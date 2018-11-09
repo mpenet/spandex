@@ -1,12 +1,12 @@
 {:deps
- {org.clojure/clojure {:mvn/version "1.9.0"}
+ {org.clojure/clojure {:mvn/version "1.10.0-beta5"}
   org.clojure/core.async {:mvn/version "0.4.474"}
   org.elasticsearch.client/elasticsearch-rest-client
-  {:mvn/version "6.3.1"
+  {:mvn/version "6.4.3"
    ;; more recent through ring/ring-codec
    :exclusions [commons-codec]}
   org.elasticsearch.client/elasticsearch-rest-client-sniffer
-  {:mvn/version "6.3.1"
+  {:mvn/version "6.4.3"
    :exclusions [com.fasterxml.jackson.core/jackson-core
                 commons-codec]}
   cc.qbits/commons {:mvn/version "0.5.1"}

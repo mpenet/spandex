@@ -187,7 +187,8 @@
 
 (defn builder [{:as options
                 :keys [hosts]}]
-  (let [b (RestClient/builder (into-array HttpHost
+  (let [b (RestClient/builder  ^"[Lorg.apache.http.HttpHost;"
+                              (into-array HttpHost
                                           (map #(HttpHost/create %) hosts)))]
     (set-options! b options)
     (.build b)))

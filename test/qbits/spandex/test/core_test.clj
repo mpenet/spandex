@@ -149,6 +149,7 @@
            (catch org.elasticsearch.client.ResponseException ex
              true)
            (catch Throwable _
+             (.printStackTrace _)
              false)))
   (->> (async/<!! (s/request-chan client {:url "a/b/c/d/"}))
        ex-data

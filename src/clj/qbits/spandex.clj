@@ -11,10 +11,13 @@
   (:import
    (org.elasticsearch.client.sniff
     Sniffer
-    ElasticsearchHostsSniffer
-    ElasticsearchHostsSniffer$Scheme
+    ElasticsearchNodesSniffer
+    ElasticsearchNodesSniffer$Scheme
     SniffOnFailureListener)
    (org.elasticsearch.client
+    Request
+    RequestOptions
+    RequestOptions$Builder
     RestClient
     ResponseListener
     HttpAsyncResponseConsumerFactory
@@ -84,7 +87,7 @@
   ([options]
    (client-options/builder options)))
 
-(def ^:no-doc sniffer-scheme (enum/enum->fn ElasticsearchHostsSniffer$Scheme))
+(def ^:no-doc sniffer-scheme (enum/enum->fn ElasticsearchNodesSniffer$Scheme))
 
 (defn sniffer
   "Takes a Client instance (and possible sniffer options) and returns
@@ -108,8 +111,8 @@
   ([client {:as options
             :keys [scheme timeout]
             :or {scheme :http
-                 timeout ElasticsearchHostsSniffer/DEFAULT_SNIFF_REQUEST_TIMEOUT}}]
-   (let [sniffer (ElasticsearchHostsSniffer. client
+                 timeout ElasticsearchNodesSniffer/DEFAULT_SNIFF_REQUEST_TIMEOUT}}]
+   (let [sniffer (ElasticsearchNodesSniffer. client
                                              timeout
                                              (sniffer-scheme scheme))]
      (sniffer-options/builder client sniffer options))))
@@ -153,19 +156,10 @@
   (encode-body [x]
     (NStringEntity. (json/generate-string x)
                     StandardCharsets/UTF_8))
-
   nil
   (encode-body [x] nil))
 
 (def default-headers {"Content-Type" "application/json; charset=UTF8"})
-
-(defn ^:no-doc encode-headers
-  [headers]
-  (->> headers
-       (conj default-headers)
-       (map (fn [[k v]]
-              (BasicHeader. (name k) v)))
-       (into-array Header)))
 
 (defn ^:no-doc response-headers
   [^org.elasticsearch.client.Response response]
@@ -177,12 +171,6 @@
                          (.getValue h)))
                (transient {}))
        persistent!))
-
-(defn ^:no-doc encode-query-string
-  [qs]
-  (reduce-kv (fn [m k v] (assoc m (name k) (str v)))
-             {}
-             qs))
 
 (defn ^:no-doc json-entity?
   [^HttpEntity entity]
@@ -262,6 +250,38 @@
       (when error
         (error (exception-handler ex))))))
 
+(defn ->request
+  [{:as request-map
+    :keys [url method query-string headers body
+           response-consumer-factory
+           ^RequestOptions$Builder request-options]
+    :or {method :get
+         headers default-headers}}]
+  (let [request-options (or request-options
+                            (.toBuilder (RequestOptions/DEFAULT)))
+        request (Request. (name method)
+                          (url/encode url))]
+    (when headers
+      (run! (fn [[k v]]
+              (.addHeader request-options
+                          (name k)
+                          (str v)))
+            headers))
+    (when response-consumer-factory
+      (.setHttpAsyncResponseConsumerFactory request-options
+                                            response-consumer-factory))
+    (when query-string
+      (run! (fn [[k v]]
+              (.addParameter request
+                             (name k)
+                             (str v)))
+            query-string))
+    (when body
+      (.setEntity request (encode-body body)))
+
+    (doto request
+      (.setOptions request-options))))
+
 (defn request
   [^RestClient client {:keys [method url headers query-string body
                               keywordize?
@@ -274,13 +294,7 @@
                        :as request-params}]
   (try
     (-> client
-        (.performRequest
-         (name method)
-         (url/encode url)
-         (encode-query-string query-string)
-         (encode-body body)
-         response-consumer-factory
-         (encode-headers headers))
+        (.performRequest (->request request-params))
         (response-decoder keywordize?))
     (catch Exception e
       (exception-handler e))))
@@ -301,16 +315,11 @@
     :as request-params}]
   (try
     (.performRequestAsync client
-                          (name method)
-                          (url/encode url)
-                          (encode-query-string query-string)
-                          (encode-body body)
-                          response-consumer-factory
+                          (->request request-params)
                           (response-listener success
                                              error
                                              keywordize?
-                                             exception-handler)
-                          (encode-headers headers))
+                                             exception-handler))
     (catch Exception e
       (exception-handler e))))
 
@@ -479,3 +488,6 @@
          {:input-ch input-ch
           :output-ch output-ch
           :request-ch request-ch})))))
+
+;; (def c (client {:hosts ["http://0.0.0.0:9200"]}))
+;; (request c {:url "_stats"})

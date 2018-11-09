@@ -27,6 +27,6 @@
 
 (defn builder [client sniffer options]
   (-> (Sniffer/builder client)
-      (.setHostsSniffer sniffer)
+      (.setNodesSniffer sniffer)
       (set-options! options)
       .build))
