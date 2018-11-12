@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.0-alpha1
+
+* bump dependencies
+
 ## 0.6.4
 
 * bump dependencies
