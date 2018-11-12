@@ -103,7 +103,8 @@ could be caused by a missing :url key).
 ```
 
 ### Scrolling
-Scrolling via core.async (fully NIO internally), interuptable if you
+
+Scrolling via core.async (fully NIO internally), interruptible if you
 async/close! the returned chan.
 
 ``` clojure
@@ -118,8 +119,8 @@ async/close! the returned chan.
 ### Bulk requests scheduling
 
 "Faux streaming" of _bulk requests (flushes bulk request after
-interval or threshold, you can specify these as options). Uses
-request-chan internally, so it's quite cheap.
+configurable interval or threshold. Uses request-chan internally, so
+it's quite cheap.
 
 ```clojure
 (let [{:keys [input-ch output-ch]} (bulk-chan client {:flush-threshold 100
@@ -150,7 +151,7 @@ If you wish to support the work on this project you can do this via my
 
 ## License
 
-Copyright © 2017 [Max Penet](http://twitter.com/mpenet)
+Copyright © 2018 [Max Penet](http://twitter.com/mpenet)
 
 Distributed under the
 [Eclipse Public License](http://www.eclipse.org/legal/epl-v10.html),
