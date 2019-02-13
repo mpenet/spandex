@@ -1,8 +1,8 @@
 {:deps
- {org.clojure/clojure {:mvn/version "1.10.0-beta5"}
-  org.clojure/core.async {:mvn/version "0.4.474"}
+ {org.clojure/clojure {:mvn/version "1.10.0"}
+  org.clojure/core.async {:mvn/version "0.4.490"}
   org.elasticsearch.client/elasticsearch-rest-client
-  {:mvn/version "6.4.3"
+  {:mvn/version "6.6.0"
    ;; more recent through ring/ring-codec
    :exclusions [commons-codec]}
   org.elasticsearch.client/elasticsearch-rest-client-sniffer
