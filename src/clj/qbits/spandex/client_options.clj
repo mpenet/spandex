@@ -126,10 +126,6 @@
 ;; top level options
 (defmulti ^:no-doc set-option! (fn [k builder option] k))
 
-(defmethod set-option! :max-retry-timeout
-  [_ ^RestClientBuilder builder timeout-ms]
-  (-> builder (.setMaxRetryTimeoutMillis (int timeout-ms))))
-
 (defmethod set-option! :default-headers
   [_ ^RestClientBuilder builder headers]
   (-> builder (.setDefaultHeaders (into-array BasicHeader
