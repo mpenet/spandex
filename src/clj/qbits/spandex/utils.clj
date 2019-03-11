@@ -23,7 +23,7 @@
   (if (= query "*")
     query
     (-> query
-        ; escape the reserved characters
+        ;; escape the reserved characters
         (string/replace #"[\+\-\!\(\)\{\}\[\]^\"~\*\?\\:/]|&&|\|\|" #(str "\\" %1))
-        ; according to the doc we can't even escape those
+        ;; according to the doc we can't even escape those
         (string/replace #"[<>]" ""))))
