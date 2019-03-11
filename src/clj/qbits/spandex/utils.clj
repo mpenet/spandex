@@ -14,7 +14,7 @@
   (when-let [v (async/<!! ch)]
     (cons v (lazy-seq (chan->seq ch)))))
 
-(defn escape-query
+(defn escape-query-string
   "Escape or remove special characters in query string coming from users.
 
   See:
