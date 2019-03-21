@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.7.0-beta3
+
+* Fix scroll_id issue in scroll-chan. See #44
+
+## 0.7.0-beta2
+
+* add `qbits.spandex.utils/escape-query-string` function
+
 ## 0.7.0-alpha1
 
 * bump dependencies
