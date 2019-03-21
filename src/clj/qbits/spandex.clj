@@ -375,23 +375,23 @@
         (async/>! ch response)
         (when (and (-> response :body :hits :hits count (> 0))
                    scroll-id)
-          (loop []
-            (let [response (async/<! (request-chan client
-                                                   {:url "/_search/scroll"
-                                                    :query-string {:scroll_id scroll-id
-                                                                   :scroll ttl}}))]
-              (cond
-                ;; it's an error and we must exit the consuming process
-                (or (instance? Exception response)
-                    (not= 200 (:status response)))
+          (loop [scroll-id scroll-id]
+            (let [response
+                  (async/<! (request-chan client
+                                          {:url "/_search/scroll"
+                                           :query-string {:scroll_id scroll-id
+                                                          :scroll ttl}}))]
+              ;; it's an error and we must exit the consuming process
+              (if (or (instance? Exception response)
+                      (not= 200 (:status response)))
                 (async/>! ch response)
-
                 ;; we need to make sure the user didn't close the
                 ;; returned chan for scroll interuption and that we
                 ;; actually have more results to feed
-                (and (-> response :body :hits :hits seq)
-                     (async/>! ch response))
-                (recur)))))
+                (let [body (:body response)]
+                  (when (and (-> body :hits :hits seq)
+                             (async/>! ch response))
+                    (recur (:_scroll_id body))))))))
         (async/close! ch)))
     ch))
 
@@ -441,15 +441,15 @@
                   (recur)
                   (async/close! out-ch)))))
           (build-map [request-map payload]
-                     (assoc request-map
-                            :body
-                            (->> payload
-                                 (reduce (fn [payload chunk]
-                                           (if (sequential? chunk)
-                                             (concat payload chunk)
-                                             (conj payload chunk)))
-                                         [])
-                                 chunks->body)))]
+            (assoc request-map
+                   :body
+                   (->> payload
+                        (reduce (fn [payload chunk]
+                                  (if (sequential? chunk)
+                                    (concat payload chunk)
+                                    (conj payload chunk)))
+                                [])
+                        chunks->body)))]
     (fn bulk-chan
       ([client] (bulk-chan client {}))
       ([client {:as request-map
@@ -474,8 +474,8 @@
                    #(request-chan client (build-map request-map %))
                    max-concurrent-requests)
          (async/go-loop
-          [payload []
-           timeout-ch (async/timeout flush-interval)]
+             [payload []
+              timeout-ch (async/timeout flush-interval)]
            (let [[chunk ch] (async/alts! [timeout-ch input-ch])]
              (cond
                (= timeout-ch ch)
