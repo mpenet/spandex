@@ -366,11 +366,10 @@
            :or {ttl "1m"}}]
   (let [ch (or output-ch (async/chan))]
     (async/go
-      (let [response
-            (async/<! (request-chan client
-                                    (assoc-in request-map
-                                              [:query-string :scroll]
-                                              ttl)))
+      (let [response (async/<! (request-chan client
+                                             (assoc-in request-map
+                                                       [:query-string :scroll]
+                                                       ttl)))
             scroll-id (some-> response :body :_scroll_id)]
         (async/>! ch response)
         (when (and (-> response :body :hits :hits count (> 0))
