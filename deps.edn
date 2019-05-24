@@ -1,9 +1,10 @@
 {:deps
  {org.clojure/clojure {:mvn/version "1.10.1-RC1"}
   org.clojure/core.async {:mvn/version "0.4.490"}
-  org.elasticsearch.client/elasticsearch-rest-client{:mvn/version "7.1.0"}
+  org.elasticsearch.client/elasticsearch-rest-client {:mvn/version "7.1.0"}
   org.elasticsearch.client/elasticsearch-rest-client-sniffer
-  {:mvn/version "7.1.0" :exclusions [com.fasterxml.jackson.core/jackson-core]}
+  {:mvn/version "7.1.0"
+   :exclusions [com.fasterxml.jackson.core/jackson-core]}
   cc.qbits/commons {:mvn/version "0.5.1"}
   cheshire {:mvn/version "5.8.1"}
   ring/ring-codec {:mvn/version "1.1.1"}}

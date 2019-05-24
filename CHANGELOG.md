@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.0
+
+* bump dependencies: clojure, elasticsearch-rest-client to 7.1
+
 ## 0.7.0-beta3
 
 * Fix scroll_id issue in scroll-chan. See #44
