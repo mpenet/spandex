@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.1
+
+* Fix scroll-id larger than 4K causing `too_long_frame_exception` #45
+
+* bump dependencies: clojure, core.async, commons, elasticsearch-rest-client to 7.2
+
 ## 0.7.0
 
 * bump dependencies: clojure, elasticsearch-rest-client to 7.1
