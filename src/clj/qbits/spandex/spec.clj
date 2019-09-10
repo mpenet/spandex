@@ -107,7 +107,7 @@
 
 (s/def ::request/url #(satisfies? qbits.spandex.url/URL %))
 (s/def ::request/scheme #{:http :https})
-(s/def ::request/method #{:get :post :put :head})
+(s/def ::request/method #{:get :post :put :head :delete})
 (s/def ::request/headers (s/map-of (s/or :kw keyword? :str string?)
                                    string?))
 (s/def ::request/query-string (s/map-of (s/or :kw keyword? :str string?)
