@@ -377,10 +377,11 @@
           (loop [scroll-id scroll-id]
             (let [response
                   (async/<! (request-chan client
-                                          {:method :post
-                                           :url "/_search/scroll"
-                                           :body {:scroll_id scroll-id
-                                                  :scroll ttl}}))]
+                                          (merge request-map
+                                                 {:method :post
+                                                  :url "/_search/scroll"
+                                                  :body {:scroll_id scroll-id
+                                                         :scroll ttl}})))]
               ;; it's an error and we must exit the consuming process
               (if (or (instance? Exception response)
                       (not= 200 (:status response)))
