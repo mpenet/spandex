@@ -377,10 +377,11 @@
           (loop [scroll-id scroll-id]
             (let [response
                   (async/<! (request-chan client
-                                          {:method :post
-                                           :url "/_search/scroll"
-                                           :body {:scroll_id scroll-id
-                                                  :scroll ttl}}))]
+                                          (merge request-map
+                                                 {:method :post
+                                                  :url "/_search/scroll"
+                                                  :body {:scroll_id scroll-id
+                                                         :scroll ttl}})))]
               ;; it's an error and we must exit the consuming process
               (if (or (instance? Exception response)
                       (not= 200 (:status response)))
@@ -392,6 +393,15 @@
                   (when (and (-> body :hits :hits seq)
                              (async/>! ch response))
                     (recur (:_scroll_id body))))))))
+
+        ;; When we're done with a scroll we tidy it up early.
+        ;; Otherwise we have to wait for the ttl to expire.
+        ;; Let's be nice to ES.
+        (async/<! (request-chan client
+                                {:method :delete
+                                 :url "/_search/scroll"
+                                 :body {:scroll_id scroll-id}}))
+
         (async/close! ch)))
     ch))
 
