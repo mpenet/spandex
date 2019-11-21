@@ -1,4 +1,4 @@
-(def es-client-version "7.2.0")
+(def es-client-version "7.2.1-SNAPSHOT")
 (defproject cc.qbits/spandex "0.7.1"
   :description "Clojure Wrapper of the new/official ElasticSearch REST client"
   :url "https://github.com/mpenet/spandex"
@@ -12,6 +12,7 @@
                  [cc.qbits/commons "0.5.2"]
                  [cheshire "5.8.1"]
                  [ring/ring-codec "1.1.1"]]
+  :deploy-repositories [["snapshots" :clojars] ["releases" :clojars]]
   :source-paths ["src/clj"]
   :global-vars {*warn-on-reflection* true}
   :pedantic? :warn
