@@ -398,9 +398,10 @@
         ;; Otherwise we have to wait for the ttl to expire.
         ;; Let's be nice to ES.
         (async/<! (request-chan client
-                                {:method :delete
-                                 :url "/_search/scroll"
-                                 :body {:scroll_id scroll-id}}))
+                                (merge request-map
+                                       {:method :delete
+                                        :url "/_search/scroll"
+                                        :body {:scroll_id scroll-id}})))
 
         (async/close! ch)))
     ch))
