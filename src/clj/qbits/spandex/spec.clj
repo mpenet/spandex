@@ -2,7 +2,6 @@
   (:require
    [qbits.spandex]
    [clojure.spec.alpha :as s]
-   [clojure.core.async :as async]
    [qbits.spandex.url]
    [qbits.spandex.utils :as u])
   (:import
