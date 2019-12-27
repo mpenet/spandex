@@ -485,8 +485,8 @@
                    #(request-chan client (build-map request-map %))
                    max-concurrent-requests)
          (async/go-loop
-             [payload []
-              timeout-ch (async/timeout flush-interval)]
+          [payload []
+           timeout-ch (async/timeout flush-interval)]
            (let [[chunk ch] (async/alts! [timeout-ch input-ch])]
              (cond
                (= timeout-ch ch)

@@ -2,7 +2,6 @@
   (:require
    [qbits.spandex]
    [clojure.spec.alpha :as s]
-   [clojure.core.async :as async]
    [qbits.spandex.url]
    [qbits.spandex.utils :as u])
   (:import
@@ -121,7 +120,7 @@
 (s/def ::request/exception-handler
   fn?
   ;; (s/fspec :args (s/cat :throwable #(instance? Throwable %)))
-)
+  )
 
 (alias 'response (create-ns 'qbits.spandex.spec.response))
 (s/def ::response (s/keys :req-un [::response/body

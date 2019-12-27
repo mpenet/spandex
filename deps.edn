@@ -1,13 +1,13 @@
 {:deps
  {org.clojure/clojure {:mvn/version "1.10.1"}
-  org.clojure/core.async {:mvn/version "0.4.500"}
-  org.elasticsearch.client/elasticsearch-rest-client {:mvn/version "7.2.0"}
+  org.clojure/core.async {:mvn/version "0.6.532"}
+  org.elasticsearch.client/elasticsearch-rest-client {:mvn/version "7.5.0"}
   org.elasticsearch.client/elasticsearch-rest-client-sniffer
-  {:mvn/version "7.1.0"
+  {:mvn/version "7.5.0"
    :exclusions [com.fasterxml.jackson.core/jackson-core]}
   cc.qbits/commons {:mvn/version "0.5.2"}
-  cheshire {:mvn/version "5.8.1"}
-  ring/ring-codec {:mvn/version "1.1.1"}}
+  cheshire {:mvn/version "5.9.0"}
+  ring/ring-codec {:mvn/version "1.1.2"}}
 
  :paths ["src/clj"]
 
@@ -18,6 +18,6 @@
            :cljfmt {:extra-deps {com.jameslaverack/cljfmt-runner {:git/url "https://github.com/JamesLaverack/cljfmt-runner"
                                                                   :sha "fc12c2724c44185cd1b221a79c8486c73846f14c"
                                                                   :exclusions [cljfmt]}
-                                 cljfmt {:mvn/version "0.6.1"}}
+                                 cljfmt {:mvn/version "0.6.4"}}
                     :main-opts ["-m" "cljfmt-runner.check"]}
            :cljfmt/fix {:main-opts ["-m" "cljfmt-runner.fix"]}}}
