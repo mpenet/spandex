@@ -350,6 +350,33 @@
         (async/put! ch e)))
     ch))
 
+(defn- repetitive-chan
+  [client output-ch
+   response->loop-arg-fn
+   loop-arg->request-map-fn
+   loop-arg->cleanup-fn]
+  (let [ch (or output-ch (async/chan))]
+    (async/go
+      (loop [loop-arg nil]
+        (let [request-map (loop-arg->request-map-fn loop-arg)
+              {:as response, :keys [body status]} (async/<! (request-chan client request-map))
+              loop-arg (response->loop-arg-fn response)]
+          ;; it's an error and we must exit the consuming process
+          (if (or (instance? Exception response)
+                  (not= 200 status))
+            (do (async/>! ch response)
+                (async/<! (loop-arg->cleanup-fn loop-arg)))
+            ;; we need to make sure the user didn't close the
+            ;; returned chan for interuption and that we
+            ;; actually have more results to feed
+            (if (and loop-arg
+                     (-> body :hits :hits seq)
+                     (async/>! ch response))
+              (recur loop-arg)
+              (async/<! (loop-arg->cleanup-fn loop-arg))))))
+      (async/close! ch))
+    ch))
+
 (defn scroll-chan
   "Returns a core async channel. Takes the same args as
   `qbits.spandex/request`. Perform async scrolling requests for a
@@ -364,46 +391,50 @@
   have multiple scroll-chan calls feed the same channel instance"
   [client {:as request-map :keys [ttl output-ch]
            :or {ttl "1m"}}]
-  (let [ch (or output-ch (async/chan))]
-    (async/go
-      (let [response (async/<! (request-chan client
-                                             (assoc-in request-map
-                                                       [:query-string :scroll]
-                                                       ttl)))
-            scroll-id (some-> response :body :_scroll_id)]
-        (async/>! ch response)
-        (when (and (-> response :body :hits :hits count (> 0))
-                   scroll-id)
-          (loop [scroll-id scroll-id]
-            (let [response
-                  (async/<! (request-chan client
-                                          (merge request-map
-                                                 {:method :post
-                                                  :url "/_search/scroll"
-                                                  :body {:scroll_id scroll-id
-                                                         :scroll ttl}})))]
-              ;; it's an error and we must exit the consuming process
-              (if (or (instance? Exception response)
-                      (not= 200 (:status response)))
-                (async/>! ch response)
-                ;; we need to make sure the user didn't close the
-                ;; returned chan for scroll interuption and that we
-                ;; actually have more results to feed
-                (let [body (:body response)]
-                  (when (and (-> body :hits :hits seq)
-                             (async/>! ch response))
-                    (recur (:_scroll_id body))))))))
+  (let [ch (repetitive-chan
+            client output-ch
+            (fn [response]
+              (-> response :body :_scroll_id))
+            (fn [scroll-id]
+              (if scroll-id
+                {:method :post
+                 :url "/_search/scroll"
+                 :body {:scroll ttl
+                        :scroll_id scroll-id}}
+                (assoc request-map
+                       :query-string {:scroll ttl})))
+            ;; When we're done with a scroll we tidy it up early.
+            ;; Otherwise we have to wait for the ttl to expire.
+            ;; Let's be nice to ES.
+            (fn [scroll-id]
+              (request-chan client
+                            {:method :delete
+                             :url "/_search/scroll"
+                             :body {:scroll_id scroll-id}})))]
+    ch))
 
-        ;; When we're done with a scroll we tidy it up early.
-        ;; Otherwise we have to wait for the ttl to expire.
-        ;; Let's be nice to ES.
-        (async/<! (request-chan client
-                                (merge request-map
-                                       {:method :delete
-                                        :url "/_search/scroll"
-                                        :body {:scroll_id scroll-id}})))
-
-        (async/close! ch)))
+(defn search-after-chan
+  "Returns a core.async/chan. Takes the same args as `qbits.spandex/request` but it's required to specify :sort in :body (see documentation below).
+  Perform async _search requests similarly to a scroll but using Search After:
+  https://www.elastic.co/guide/en/elasticsearch/reference/6.8/search-request-search-after.html
+  It will request more pages as the user takes from the channel.
+  Every take! will request/return a page from the request.
+  You can also supply a :output-ch key to the request map, a chan
+  that will receive the results. This allow you to have custom buffers, or
+  have multiple queries combined into a single chan."
+  [client {:as request-map :keys [output-ch body]}]
+  (assert (:sort body) "This requires to have a total ordering giveng to ElasticSearch through :sort.")
+  (let [ch (repetitive-chan
+            client output-ch
+            (fn [response]
+              (-> response :body :hits :hits last :sort))
+            (fn [sort-last]
+              (cond-> request-map
+                sort-last
+                (assoc-in [:body :search_after] sort-last)))
+            ; no cleanup
+            (fn [sort-last]
+              (async/go)))]
     ch))
 
 (defn chunks->body
