@@ -22,7 +22,7 @@
 
 (def doc {:some {:fancy "thing"}})
 (def doc-id (java.util.UUID/randomUUID))
-(def client (s/client))
+(def client (s/client {:hosts [server]}))
 (def sniffer (s/sniffer client))
 
 (defn wait! []
