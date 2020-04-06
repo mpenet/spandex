@@ -1,12 +1,13 @@
 (ns qbits.spandex.test.core-test
   (:refer-clojure :exclude [type])
-  (:use clojure.test)
   (:require
+   [clojure.test :refer :all]
    [clojure.core.async :as async]
    [qbits.spandex :as s]
    [qbits.spandex.url :as url]
    [qbits.spandex.utils :as utils])
-  (:import (qbits.spandex Response)))
+  (:import (qbits.spandex Response)
+           (clojure.lang ExceptionInfo)))
 
 (try
   (require 'qbits.spandex.spec)
@@ -18,25 +19,22 @@
 
 (def server "http://127.0.0.1:9200")
 (def index (java.util.UUID/randomUUID))
-(def type (java.util.UUID/randomUUID))
+(def type :_doc)
 
 (def doc {:some {:fancy "thing"}})
 (def doc-id (java.util.UUID/randomUUID))
 (def client (s/client {:hosts [server]}))
 (def sniffer (s/sniffer client))
 
-(defn wait! []
-  (Thread/sleep 3000))
-
 (use-fixtures
   :each
   (fn [t]
+    (t)
     (try
       (s/request client
                  {:method :delete
-                  :url [index type]})
-      (catch Exception _ nil))
-    (t)))
+                  :url [index]})
+      (catch Exception _ nil))))
 
 (deftest test-url
   (is (= (url/encode [:foo 1 "bar"]) "/foo/1/bar"))
@@ -78,11 +76,13 @@
           (= (clojure.walk/stringify-keys doc)))))
 
 (deftest test-head-req
-  (is (-> (s/request client
-                     {:url [index type doc-id]
-                      :method :head})
-          :body
-          nil?)))
+  (try
+    (s/request client
+               {:url [index type doc-id]
+                :method :head})
+    (is false)
+    (catch ExceptionInfo ex
+      (is (-> ex ex-data :status (= 404))))))
 
 (deftest test-async-sync-query
   (s/request client
@@ -99,33 +99,37 @@
                                (deliver p response))})
     (is (contains? #{200 201} (:status @p)))))
 
+(defn- fill-in-docs!
+  [i]
+  (s/request client
+             {:url [index type "_bulk"]
+              :method :post
+              :query-string {:refresh true}
+              :body (->> (for [i (range i)]
+                           [{:index {:_id i}}
+                            {:value i}])
+                         (mapcat identity)
+                         (s/chunks->body))}))
+
 (deftest test-scrolling-chan
-  (dotimes [i 99]
-    (s/request client
-               {:url [index type (str i)]
-                :method :post
-                :body doc}))
-  (wait!)
-  (let [ch (s/scroll-chan client {:url [index type :_search]})]
+  (fill-in-docs! 100)
+  (let [ch (s/scroll-chan client {:url [index type :_search]
+                                  :body {:sort {:value :asc}}})]
     (-> (async/go
           (loop [docs []]
             (if-let [docs' (-> (async/<! ch) :body :hits :hits seq)]
               (recur (concat docs docs'))
               docs)))
         async/<!!
-        count
-        (= 100)
+        (->> (map :_source))
+        (= (for [i (range 100)] {:value i}))
         is)))
 
 (deftest test-scrolling-chan-interupted
-  (dotimes [i 99]
-    (s/request client
-               {:url [index type (str i)]
-                :method :post
-                :body doc}))
-  (wait!)
+  (fill-in-docs! 100)
   (let [ch (s/scroll-chan client {:url [index type :_search]
-                                  :body {:size 1}})]
+                                  :body {:size 1
+                                         :sort {:value :asc}}})]
     (-> (async/go
           (loop [docs []
                  countdown 33]
@@ -137,8 +141,24 @@
                        (dec countdown)))
               docs)))
         async/<!!
-        count
-        (= 33)
+        (->> (map :_source))
+        (= (for [i (range 33)] {:value i}))
+        is)))
+
+(deftest test-search-after-chan
+  (fill-in-docs! 100)
+  (let [ch (s/search-after-chan client
+                                {:url [index type :_search]
+                                 :body {:size 1
+                                        :sort {:value :asc}}})]
+    (-> (async/go
+          (loop [docs []]
+            (if-let [docs' (-> (async/<! ch) :body :hits :hits seq)]
+              (recur (concat docs docs'))
+              docs)))
+        async/<!!
+        (->> (map :_source))
+        (= (for [i (range 100)] {:value i}))
         is)))
 
 (deftest test-exceptions []
