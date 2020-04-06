@@ -1,4 +1,4 @@
-(def es-client-version "7.5.0")
+(def es-client-version "7.6.2")
 (defproject cc.qbits/spandex "0.7.5-SNAPSHOT"
   :description "Clojure Wrapper of the new/official ElasticSearch REST client"
   :url "https://github.com/mpenet/spandex"
