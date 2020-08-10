@@ -14,6 +14,9 @@
     AuthScope)
    (org.apache.http.message
     BasicHeader)
+   (org.apache.http.ssl
+    SSLContextBuilder
+    TrustStrategy)
    (org.elasticsearch.client
     RestClient
     RestClientBuilder
@@ -21,6 +24,16 @@
     RestClientBuilder$HttpClientConfigCallback)
    (org.elasticsearch.client.sniff
     SniffOnFailureListener)))
+
+(defn ssl-context-trust-all
+  "Return a SSLContext that trusts all certificate"
+  []
+  (-> (SSLContextBuilder.)
+      (.loadTrustMaterial nil
+                          (reify
+                            TrustStrategy
+                            (isTrusted [_ _ _] true)))
+      .build))
 
 ;; request opts
 (defmulti set-request-option! (fn [k builder option] k))
