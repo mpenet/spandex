@@ -1,5 +1,5 @@
 (def es-client-version "7.6.2")
-(defproject cc.qbits/spandex "0.7.6"
+(defproject cc.qbits/spandex "0.7.7-SNAPSHOT"
   :description "Clojure Wrapper of the new/official ElasticSearch REST client"
   :url "https://github.com/mpenet/spandex"
   :license {:name "Eclipse Public License"
