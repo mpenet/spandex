@@ -18,15 +18,13 @@
 (s/def ::client #(instance? RestClient %))
 
 (alias 'client-options (create-ns 'qbits.spandex.spec.client-options))
-(s/def ::client-options (s/keys :opt-un [::client-options/max-retry-timeout
-                                         ::client-options/default-headers
+(s/def ::client-options (s/keys :opt-un [::client-options/default-headers
                                          ::client-options/failure-listener
                                          ::client-options/node-selector
                                          ::client-options/http-client
                                          ::client-options/request]))
 
 (s/def ::client-options/failure-listener #(instance? RestClient$FailureListener %))
-(s/def ::client-options/max-retry-timeout int?)
 (s/def ::client-options/default-headers (s/map-of (s/or :kw keyword? :str string?)
                                                   string?))
 (s/def ::client-options/node-selector #(instance? NodeSelector %))
