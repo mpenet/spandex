@@ -171,12 +171,11 @@
 (s/def ::flush-interval pos-int?)
 (s/def ::flush-threshold pos-int?)
 (s/def ::max-concurrent-requests pos-int?)
-(s/def ::bulk-chan-options (s/and ::request
-                                  (s/keys :opt-un [::input-ch
-                                                   ::output-ch
-                                                   ::flush-threshold
-                                                   ::flush-interval
-                                                   ::max-concurrent-requests])))
+(s/def ::bulk-chan-options (s/keys :opt-un [::input-ch
+                                            ::output-ch
+                                            ::flush-threshold
+                                            ::flush-interval
+                                            ::max-concurrent-requests]))
 (s/fdef qbits.spandex/bulk-chan
   :args (s/cat :client ::client
                :options ::bulk-chan-options)
