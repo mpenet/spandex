@@ -415,23 +415,37 @@
 
 (def bulk-chan
   "Bulk-chan takes a client, a partial request/option map, returns a
-  map of :input-ch :output-ch. :input-ch is a channel that will accept
-  bulk fragments to be sent (either single or collection). It then will
+  map of `:input-ch`, `:output-ch` and `:flush-ch`.
+
+  `:input-ch` is a channel that will accept bulk fragments to be
+  sent (either single or collection). It then will
   wait (:flush-interval request-map) or (:flush-threshold request-map)
   and then trigger an async request with the bulk payload accumulated.
+
   Parallelism of the async requests is controllable
-  via (:max-concurrent-requests request-map). If the number of triggered
-  requests exceeds the capacity of the job buffer, puts! in :input-ch will
-  block (if done with async/put! you can check the return value before
-  overflowing the put! pending queue). Jobs results returned from the
-  processing are a pair of job and responses map, or exception.  The
-  :output-ch will allow you to inspect [job responses] the server
-  returned and handle potential errors/failures accordingly (retrying
-  etc). If you close! the :input-ch it will close the underlying
-  resources and exit cleanly (consuming all jobs that remain in
-  queues). By default requests are run against _bulk, but the option
-  map is passed as is to request-chan, you can overwrite options here
-  and provide your own url, headers and so on."
+  via (:max-concurrent-requests request-map).
+
+  If the number of triggered requests exceeds the capacity of the job
+  buffer, puts! in `:input-ch` will block (if done with async/put! you
+  can check the return value before overflowing the put! pending
+  queue).
+
+  Jobs results returned from the processing are a pair of job and
+  responses map, or exception.  The :output-ch will allow you to
+  inspect [job responses] the server returned and handle potential
+  errors/failures accordingly (retrying etc).
+
+  If you close! the `:input-ch` it will close the underlying resources
+  and exit cleanly (consuming all jobs that remain in queues).
+
+  By default requests are run against _bulk, but the option map is
+  passed as is to request-chan, you can overwrite options here and
+  provide your own url, headers and so on.
+
+  `:flush-ch` is provided to afford an immediate flush of the contents
+  of the job buffer, by putting a truthy value onto this channel.
+  Values that are not truthy will be ignored.  puts! on :flush-ch
+  won't block, but duplicate flush requests will be ignored."
   (letfn [(par-run! [in-ch out-ch f n]
             (let [procs (async/merge (repeatedly n
                                                  (fn []
@@ -474,6 +488,7 @@
                                request-map)
              input-ch (or input-ch (async/chan))
              output-ch (or output-ch (async/chan))
+             flush-ch (async/chan (async/sliding-buffer 1) (filter boolean))
              request-ch (async/chan max-concurrent-requests)]
          ;; run request processor
          (par-run! request-ch
@@ -481,11 +496,11 @@
                    #(request-chan client (build-map request-map %))
                    max-concurrent-requests)
          (async/go-loop
-          [payload []
-           timeout-ch (async/timeout flush-interval)]
-           (let [[chunk ch] (async/alts! [timeout-ch input-ch])]
+             [payload []
+              timeout-ch (async/timeout flush-interval)]
+           (let [[chunk ch] (async/alts! [flush-ch timeout-ch input-ch])]
              (cond
-               (= timeout-ch ch)
+               (#{flush-ch timeout-ch} ch)
                (do (when (seq payload)
                      (async/>! request-ch payload))
                    (recur [] (async/timeout flush-interval)))
@@ -495,7 +510,8 @@
                  (do (async/close! input-ch)
                      (when (seq payload)
                        (async/>! request-ch payload))
-                     (async/close! request-ch))
+                     (async/close! request-ch)
+                     (async/close! flush-ch))
                  (let [payload (conj payload chunk)]
                    (if (= flush-threshold (count payload))
                      (do (async/>! request-ch payload)
@@ -503,4 +519,5 @@
                      (recur payload timeout-ch)))))))
          {:input-ch input-ch
           :output-ch output-ch
+          :flush-ch flush-ch
           :request-ch request-ch})))))
