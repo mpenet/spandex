@@ -443,9 +443,7 @@
   provide your own url, headers and so on.
 
   `:flush-ch` is provided to afford an immediate flush of the contents
-  of the job buffer, by putting a truthy value onto this channel.
-  Values that are not truthy will be ignored.  puts! on :flush-ch
-  won't block, but duplicate flush requests will be ignored."
+  of the job buffer by putting anything onto this channel."
   (letfn [(par-run! [in-ch out-ch f n]
             (let [procs (async/merge (repeatedly n
                                                  (fn []
@@ -478,6 +476,7 @@
                        flush-threshold
                        input-ch
                        output-ch
+                       flush-ch
                        max-concurrent-requests]
                 :or {flush-interval 5000
                      flush-threshold 300
@@ -488,7 +487,7 @@
                                request-map)
              input-ch (or input-ch (async/chan))
              output-ch (or output-ch (async/chan))
-             flush-ch (async/chan (async/sliding-buffer 1) (filter boolean))
+             flush-ch (or flush-ch (async/chan))
              request-ch (async/chan max-concurrent-requests)]
          ;; run request processor
          (par-run! request-ch
@@ -510,8 +509,7 @@
                  (do (async/close! input-ch)
                      (when (seq payload)
                        (async/>! request-ch payload))
-                     (async/close! request-ch)
-                     (async/close! flush-ch))
+                     (async/close! request-ch))
                  (let [payload (conj payload chunk)]
                    (if (= flush-threshold (count payload))
                      (do (async/>! request-ch payload)
