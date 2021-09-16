@@ -37,6 +37,7 @@
                    ::http-client-options/max-conn-total
                    ::http-client-options/proxy
                    ::http-client-options/ssl-context
+                   ::http-client-options/ssl-noop-hostname-verifier?
                    ::http-client-options/user-agent
                    ::http-client-options/basic-auth
                    ::http-client-options/auth-caching?
@@ -50,6 +51,7 @@
   (s/keys :req-un [::basic-auth/user
                    ::basic-auth/password]))
 (s/def ::http-client-options/ssl-context #(instance? SSLContext %))
+(s/def ::http-client-options/ssl-noop-hostname-verifier? boolean?)
 (s/def ::http-client-options/proxy any?)
 (s/def ::basic-auth/user string?)
 (s/def ::basic-auth/password string?)

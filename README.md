@@ -58,6 +58,41 @@ Not to mention it supports some interesting features:
 (def s (s/sniffer c {... options ...}))
 ```
 
+#### Work with `https` via ssh tunneling
+
+First setup and make sure that you have appropriate access to the host via tunneling.
+
+e.g. Add/edit your `~/.ssh/config` to look something like
+
+```
+# Example of tunneling in ~/.ssh/config
+# .. more config
+Host my-aws-elasticsearch-host 
+  HostName 10.123.345.456
+  User ec2-user
+  IdentitiesOnly yes
+  IdentityFile ~/.ssh/my-aws-elasticsearch.pem
+  LocalForward 9200 vpc-my-aws-elasticsearch-host-lb43i.us-east-1.es.amazonaws.com:443
+  ServerAliveInterval 240
+# .. more config
+```
+
+You can then start ssh tunneling with 
+
+``` sh
+# see manpage of `ssh` for more details
+ssh -oStrictHostKeyChecking=no my-aws-elasticsearch-host -N 
+```
+
+Then you can create your client using the following `:http-client` options like
+
+```clojure
+;; if you are using tunnelling to host in AWS e.g.
+(def client (s/client {:hosts ["https://localhost:9200"]
+                       :http-client {:ssl-context (client/ssl-context-trust-all)
+                                     :ssl-noop-hostname-verifier? true}}))
+```
+
 #### Constructing URLs
 
 Most of spandex request functions take a request map as parameter. The
