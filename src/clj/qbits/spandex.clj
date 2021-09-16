@@ -71,6 +71,7 @@
       *  `:max-conn-total`
       *  `:proxy`
       *  `:ssl-context`
+      *  `:ssl-noop-hostname-verifier?`
       *  `:user-agent`
       *  `:auth-caching?`
       *  `:cookie-management?`

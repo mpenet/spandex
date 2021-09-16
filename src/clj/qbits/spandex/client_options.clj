@@ -17,6 +17,8 @@
    (org.apache.http.ssl
     SSLContextBuilder
     TrustStrategy)
+   (org.apache.http.conn.ssl
+    NoopHostnameVerifier)
    (org.elasticsearch.client
     RestClient
     RestClientBuilder
@@ -112,6 +114,12 @@
 (defmethod set-http-client-option! :ssl-context
   [_ ^HttpAsyncClientBuilder builder ssl-context]
   (.setSSLContext builder ssl-context))
+
+(defmethod set-http-client-option! :ssl-noop-hostname-verifier?
+  [_ ^HttpAsyncClientBuilder builder ssl-noop-hostname-verifier?]
+  (cond-> builder
+    ssl-noop-hostname-verifier?
+    (.setSSLHostnameVerifier NoopHostnameVerifier/INSTANCE)))
 
 (defmethod set-http-client-option! :user-agent
   [_ ^HttpAsyncClientBuilder builder user-agent]
