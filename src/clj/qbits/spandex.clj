@@ -466,7 +466,7 @@
                    (->> payload
                         (reduce (fn [payload chunk]
                                   (if (sequential? chunk)
-                                    (concat payload chunk)
+                                    (into payload chunk)
                                     (conj payload chunk)))
                                 [])
                         chunks->body)))]
