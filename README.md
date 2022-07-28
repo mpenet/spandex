@@ -1,6 +1,8 @@
 # spandex
 <!-- [![Build Status](https://travis-ci.org/mpenet/spandex.svg?branch=master)](https://travis-ci.org/mpenet/spandex) -->
 
+[![Clojars Project](https://img.shields.io/clojars/v/cc.qbits/spandex.svg)](https://clojars.org/cc.qbits/spandex)
+
 Elasticsearch new low level [rest-client](https://www.elastic.co/guide/en/elasticsearch/client/java-rest/current/index.html) wrapper
 
 ## Why?
