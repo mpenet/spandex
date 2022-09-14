@@ -11,8 +11,9 @@
 
   Will block on after the last element if the channel is not closed."
   [ch]
-  (when-let [v (async/<!! ch)]
-    (cons v (lazy-seq (chan->seq ch)))))
+  ; FIXME: if the lazy-seq isn't fully read, the underlying async is never closed!
+  (->> (repeatedly #(async/<!! ch))
+       (take-while some?)))
 
 (defn escape-query-string
   "Escape or remove special characters in query string coming from users.

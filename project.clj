@@ -10,7 +10,7 @@
                  [org.elasticsearch.client/elasticsearch-rest-client-sniffer ~es-client-version
                   :exclusions [com.fasterxml.jackson.core/jackson-core]]
                  [cc.qbits/commons "0.5.2"]
-                 [cheshire "5.9.0"]
+                 [cheshire "5.10.0"]
                  [ring/ring-codec "1.1.2"]]
   :deploy-repositories [["snapshots" :clojars] ["releases" :clojars]]
   :source-paths ["src/clj"]
