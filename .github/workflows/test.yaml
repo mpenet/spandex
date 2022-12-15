@@ -30,6 +30,9 @@ jobs:
         with:
           lein: 2.9.3
 
+      - name: Test
+        run: lein test          
+
 
 
 
