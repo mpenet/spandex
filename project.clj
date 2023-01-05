@@ -11,6 +11,7 @@
                   :exclusions [com.fasterxml.jackson.core/jackson-core]]
                  [cc.qbits/commons "0.5.2"]
                  [cheshire "5.9.0"]
+                 [orchestra "2021.01.01-1"]
                  [ring/ring-codec "1.1.2"]]
   :deploy-repositories [["snapshots" :clojars] ["releases" :clojars]]
   :source-paths ["src/clj"]

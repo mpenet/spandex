@@ -126,12 +126,13 @@
 (s/def ::response (s/keys :req-un [::response/body
                                    ::response/status
                                    ::response/headers
-                                   ::response/host]))
+                                   (or ::response/host ::response/hosts)]))
 
 (s/def ::response/headers (s/map-of string? string?))
 (s/def ::response/status pos-int?)
 (s/def ::response/body (s/nilable any?)) ;; edn/clj?
 (s/def ::response/host any?) ;; to be refine
+(s/def ::response/hosts any?) ;; to match 'hosts' field in Response record
 
 (s/def ::request-async
   (s/merge ::request
@@ -156,7 +157,7 @@
 
 (s/fdef qbits.spandex/chunks->body
   :args (s/cat :fragments (s/coll-of map?))
-  :ret string?)
+  :ret  #(instance? qbits.spandex.Raw %))
 
 (s/def ::ttl int?)
 (s/def ::ch int?)
@@ -188,5 +189,4 @@
 
 (s/fdef qbits.spandex.utils/chan->seq
   :args (s/cat :chan ::chan)
-  :ret (s/nilable (s/coll-of (s/or :response ::response
-                                   :exception #(instance? Exception %)))))
+  :ret (s/nilable (s/coll-of some?)))
