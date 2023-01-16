@@ -17,4 +17,5 @@
   :global-vars {*warn-on-reflection* true}
   :pedantic? :warn
   :profiles {:dev {:plugins [[lein-cljfmt "0.6.4"
-                              :exclusions [org.clojure/clojurescript]]]}})
+                              :exclusions [org.clojure/clojurescript]]]}
+             :test {:dependencies [[orchestra "2021.01.01-1"]]}})
