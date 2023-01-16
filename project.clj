@@ -11,11 +11,11 @@
                   :exclusions [com.fasterxml.jackson.core/jackson-core]]
                  [cc.qbits/commons "0.5.2"]
                  [cheshire "5.9.0"]
-                 [orchestra "2021.01.01-1"]
                  [ring/ring-codec "1.1.2"]]
   :deploy-repositories [["snapshots" :clojars] ["releases" :clojars]]
   :source-paths ["src/clj"]
   :global-vars {*warn-on-reflection* true}
   :pedantic? :warn
   :profiles {:dev {:plugins [[lein-cljfmt "0.6.4"
-                              :exclusions [org.clojure/clojurescript]]]}})
+                              :exclusions [org.clojure/clojurescript]]]}
+             :test {:dependencies [[orchestra "2021.01.01-1"]]}})
