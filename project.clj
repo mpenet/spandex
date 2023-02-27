@@ -13,6 +13,14 @@
                  [cheshire "5.9.0"]
                  [ring/ring-codec "1.1.2"]]
   :deploy-repositories [["snapshots" :clojars] ["releases" :clojars]]
+  :release-tasks [["vcs" "assert-committed"]
+                  ["change" "version" "leiningen.release/bump-version" "release"]
+                  ["vcs" "commit"]
+                  ["vcs" "tag" "--no-sign"]
+                  ["deploy" "clojars"]
+                  ["change" "version" "leiningen.release/bump-version"]
+                  ["vcs" "commit"]
+                  ["vcs" "push"]]
   :source-paths ["src/clj"]
   :global-vars {*warn-on-reflection* true}
   :pedantic? :warn
