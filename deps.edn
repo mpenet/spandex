@@ -1,23 +1,25 @@
-{:deps
- {org.clojure/clojure {:mvn/version "1.10.1"}
-  org.clojure/core.async {:mvn/version "0.6.532"}
-  org.elasticsearch.client/elasticsearch-rest-client {:mvn/version "7.6.2"}
-  org.elasticsearch.client/elasticsearch-rest-client-sniffer
-  {:mvn/version "7.6.2"
-   :exclusions [com.fasterxml.jackson.core/jackson-core]}
+{:exoscale.project/lib cc.qbits/spandex
+ :exoscale.project/version-file "VERSION"
+ :exoscale.project/deploy? true
+ :slipset.deps-deploy/exec-args {:installer :remote
+                                 :sign-releases? false
+                                 :repository "clojars"}
+
+ :deps
+ {org.clojure/clojure {:mvn/version "1.11.1"}
+  org.clojure/core.async {:mvn/version "1.6.681"}
+  org.elasticsearch.client/elasticsearch-rest-client {:mvn/version "8.10.0"}
+  org.elasticsearch.client/elasticsearch-rest-client-sniffer {:mvn/version "8.10.0"}
   cc.qbits/commons {:mvn/version "0.5.2"}
-  cheshire {:mvn/version "5.9.0"}
+  cheshire/cheshire {:mvn/version "5.11.0"}
   ring/ring-codec {:mvn/version "1.1.2"}}
 
  :paths ["src/clj"]
 
  :aliases {:test {:extra-paths ["test"]
-                  :extra-deps {com.cognitect/test-runner {:git/url "https://github.com/cognitect-labs/test-runner.git"
-                                                          :sha "5fb4fc46ad0bf2e0ce45eba5b9117a2e89166479"}}
-                  :main-opts ["-m" "cognitect.test-runner"]}
-           :cljfmt {:extra-deps {com.jameslaverack/cljfmt-runner {:git/url "https://github.com/JamesLaverack/cljfmt-runner"
-                                                                  :sha "fc12c2724c44185cd1b221a79c8486c73846f14c"
-                                                                  :exclusions [cljfmt]}
-                                 cljfmt {:mvn/version "0.6.4"}}
-                    :main-opts ["-m" "cljfmt-runner.check"]}
-           :cljfmt/fix {:main-opts ["-m" "cljfmt-runner.fix"]}}}
+                  :extra-deps {eftest/eftest {:mvn/version "0.6.0"}
+                               orchestra/orchestra {:mvn/version "2021.01.01-1"}}}
+           :project
+           {:extra-deps {io.github.exoscale/tools.project {:git/sha "5f24196ebea4dc6e601d201d97b463ea26923c7e"}}
+            :ns-default exoscale.tools.project
+            :jvm-opts ["-Dclojure.main.report=stderr"]}}}

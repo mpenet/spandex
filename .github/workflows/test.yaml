@@ -19,19 +19,20 @@ jobs:
       - name: Runs Elasticsearch
         uses: elastic/elastic-github-actions/elasticsearch@master
         with:
-          stack-version: 7.6.0
+          stack-version: 8.10.0
+          security-enabled: false
 
       - uses: actions/setup-java@v1
         with:
-          java-version: '11'
+          java-version: '17'
 
-      - name: Install leiningen
-        uses: DeLaGuardo/setup-clojure@master
+      - name: Install clojure tools
+        uses: DeLaGuardo/setup-clojure@10.0
         with:
-          lein: 2.9.3
+          cli: 1.11.1.1182
 
       - name: Test
-        run: lein test          
+        run: clojure -X:test qbits.spandex.test-runner/run
 
 
 

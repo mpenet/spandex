@@ -181,6 +181,14 @@ it's quite cheap.
 
 Or the [clj.specs](https://github.com/mpenet/spandex/blob/master/src/clj/qbits/spandex/spec.clj) if that's your thing:
 
+## Running the tests
+
+``` clojure
+clj -X:test qbits.spandex.test-runner/run
+```
+
+clj -X:test qbits.spandex-test-runner/run
+
 ## Patreon
 
 If you wish to support the work on this project you can do this via my
