@@ -177,7 +177,7 @@ it's quite cheap.
 
 ## API Docs
 
-[![cljdoc badge](https://cljdoc.xyz/badge/cc.qbits/spandex)](https://cljdoc.xyz/d/cc.qbits/spandex/CURRENT)
+[QuickDoc](API.md)
 
 Or the [clj.specs](https://github.com/mpenet/spandex/blob/master/src/clj/qbits/spandex/spec.clj) if that's your thing:
 

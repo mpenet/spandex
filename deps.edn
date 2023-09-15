@@ -16,10 +16,17 @@
 
  :paths ["src/clj"]
 
- :aliases {:test {:extra-paths ["test"]
-                  :extra-deps {eftest/eftest {:mvn/version "0.6.0"}
-                               orchestra/orchestra {:mvn/version "2021.01.01-1"}}}
-           :project
-           {:extra-deps {io.github.exoscale/tools.project {:git/sha "5f24196ebea4dc6e601d201d97b463ea26923c7e"}}
-            :ns-default exoscale.tools.project
-            :jvm-opts ["-Dclojure.main.report=stderr"]}}}
+ :aliases
+ {:test {:extra-paths ["test"]
+         :extra-deps {eftest/eftest {:mvn/version "0.6.0"}
+                      orchestra/orchestra {:mvn/version "2021.01.01-1"}}}
+  :project
+  {:extra-deps {io.github.exoscale/tools.project {:git/sha "5f24196ebea4dc6e601d201d97b463ea26923c7e"}}
+   :ns-default exoscale.tools.project
+   :jvm-opts ["-Dclojure.main.report=stderr"]}
+  :quickdoc
+  {:deps {org.babashka/cli {:mvn/version "0.4.36"}
+          io.github.borkdude/quickdoc
+          {:deps/root "jvm"
+           :git/sha "c5320cbe311b651a60b47f4d00d7e8ab63291b6e"}}
+   :main-opts ["-m" "babashka.cli.exec" "quickdoc.api" "quickdoc"]}}}
