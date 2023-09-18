@@ -21,7 +21,7 @@
          :extra-deps {eftest/eftest {:mvn/version "0.6.0"}
                       orchestra/orchestra {:mvn/version "2021.01.01-1"}}}
   :project
-  {:extra-deps {io.github.exoscale/tools.project {:git/sha "5f24196ebea4dc6e601d201d97b463ea26923c7e"}}
+  {:extra-deps {io.github.exoscale/tools.project {:git/sha "4ad527fac7bdc24f649404205ca31754339f856d"}}
    :ns-default exoscale.tools.project
    :jvm-opts ["-Dclojure.main.report=stderr"]}
   :quickdoc
