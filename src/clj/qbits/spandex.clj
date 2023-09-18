@@ -422,6 +422,11 @@
   sent (either single or collection). It then will
   wait (:flush-interval request-map) or (:flush-threshold request-map)
   and then trigger an async request with the bulk payload accumulated.
+   
+  If there is a requirement to correlate the return value from bulk-chann
+  with some external identifier, you can wrap each chunk in the envelope 
+    {:qbits.spandex/bulk-job job ...rest};
+  only job will sent in the bulk request but the full envelope will be returned on the out-ch.
 
   Parallelism of the async requests is controllable
   via (:max-concurrent-requests request-map).
@@ -450,7 +455,7 @@
                                                  (fn []
                                                    (async/go-loop []
                                                      (if-let [job (async/<! in-ch)]
-                                                       (let [result (async/<! (f job))]
+                                                       (let [result (async/<! (f (map #(or (::bulk-job %) %) job)))]
                                                          (async/>! out-ch [job result])
                                                          (recur))
                                                        ::exit))))
@@ -496,8 +501,8 @@
                    #(request-chan client (build-map request-map %))
                    max-concurrent-requests)
          (async/go-loop
-             [payload []
-              timeout-ch (async/timeout flush-interval)]
+          [payload []
+           timeout-ch (async/timeout flush-interval)]
            (let [[chunk ch] (async/alts! [flush-ch timeout-ch input-ch])]
              (cond
                (#{flush-ch timeout-ch} ch)
