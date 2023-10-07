@@ -1,19 +1,25 @@
 (ns qbits.spandex
   (:require
+   [cheshire.core :as json]
    [clojure.core.async :as async]
+   [clojure.java.io :as io]
+   [clojure.string :as str]
+   [qbits.commons.enum :as enum]
    [qbits.spandex.client-options :as client-options]
    [qbits.spandex.sniffer-options :as sniffer-options]
-   [qbits.commons.enum :as enum]
-   [qbits.spandex.url :as url]
-   [cheshire.core :as json]
-   [clojure.string :as str]
-   [clojure.java.io :as io])
+   [qbits.spandex.url :as url])
   (:import
-   (org.elasticsearch.client.sniff
-    Sniffer
-    ElasticsearchNodesSniffer
-    ElasticsearchNodesSniffer$Scheme
-    SniffOnFailureListener)
+   (java.nio.charset
+    StandardCharsets)
+   (java.util.zip
+    GZIPInputStream)
+   (org.apache.http
+    Header
+    HttpEntity)
+   (org.apache.http.entity
+    InputStreamEntity)
+   (org.apache.http.nio.entity
+    NStringEntity)
    (org.elasticsearch.client
     NodeSelector
     Request
@@ -23,19 +29,11 @@
     ResponseListener
     HttpAsyncResponseConsumerFactory
     ResponseException)
-   (org.apache.http
-    Header
-    HttpEntity)
-   (org.apache.http.message
-    BasicHeader)
-   (org.apache.http.nio.entity
-    NStringEntity)
-   (org.apache.http.entity
-    InputStreamEntity)
-   (java.nio.charset
-    StandardCharsets)
-   (java.util.zip
-    GZIPInputStream)))
+   (org.elasticsearch.client.sniff
+    Sniffer
+    ElasticsearchNodesSniffer
+    ElasticsearchNodesSniffer$Scheme
+    SniffOnFailureListener)))
 
 (defn client
   "Returns a client instance to be used to perform requests.
@@ -496,8 +494,8 @@
                    #(request-chan client (build-map request-map %))
                    max-concurrent-requests)
          (async/go-loop
-             [payload []
-              timeout-ch (async/timeout flush-interval)]
+          [payload []
+           timeout-ch (async/timeout flush-interval)]
            (let [[chunk ch] (async/alts! [flush-ch timeout-ch input-ch])]
              (cond
                (#{flush-ch timeout-ch} ch)

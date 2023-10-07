@@ -14,7 +14,7 @@
   cheshire/cheshire {:mvn/version "5.11.0"}
   ring/ring-codec {:mvn/version "1.1.2"}}
 
- :paths ["src/clj"]
+ :paths ["src"]
 
  :aliases
  {:test {:extra-paths ["test"]
