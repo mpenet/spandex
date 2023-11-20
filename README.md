@@ -168,7 +168,10 @@ it's quite cheap.
   (async/put! input-ch {"delete" {"_index" "website" "_type" "blog" "_id" "123"}}))
 
 ;; setup an response consumer (we just want to make sure we don't clog this channel)
-(future (loop [] (async/<!! (:output-ch c))))
+(future
+  (loop []
+    (when (async/<!! (:output-ch c))
+      (recur))))
 ```
 
 ## Installation
