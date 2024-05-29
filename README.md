@@ -192,11 +192,6 @@ clj -X:test qbits.spandex.test-runner/run
 
 clj -X:test qbits.spandex-test-runner/run
 
-## Patreon
-
-If you wish to support the work on this project you can do this via my
-[patreon](https://www.patreon.com/mpenet) page.
-
 ## License
 
 Copyright © 2018 [Max Penet](http://twitter.com/mpenet)
