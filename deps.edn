@@ -6,13 +6,13 @@
                                  :repository "clojars"}
 
  :deps
- {org.clojure/clojure {:mvn/version "1.11.1"}
-  org.clojure/core.async {:mvn/version "1.6.681"}
-  org.elasticsearch.client/elasticsearch-rest-client {:mvn/version "8.10.0"}
-  org.elasticsearch.client/elasticsearch-rest-client-sniffer {:mvn/version "8.10.0"}
-  cc.qbits/commons {:mvn/version "0.5.2"}
-  cheshire/cheshire {:mvn/version "5.11.0"}
-  ring/ring-codec {:mvn/version "1.1.2"}}
+ {org.clojure/clojure {:mvn/version "1.12.0"}
+  org.clojure/core.async {:mvn/version "1.8.741"}
+  org.elasticsearch.client/elasticsearch-rest-client {:mvn/version "9.2.1"}
+  org.elasticsearch.client/elasticsearch-rest-client-sniffer {:mvn/version "9.2.1"}
+  cc.qbits/commons {:mvn/version "1.0.0-alpha6"}
+  cheshire/cheshire {:mvn/version "6.1.0"}
+  ring/ring-codec {:mvn/version "1.3.0"}}
 
  :paths ["src"]
 
