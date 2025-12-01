@@ -1,11 +1,4 @@
-{:exoscale.project/lib cc.qbits/spandex
- :exoscale.project/version-file "VERSION"
- :exoscale.project/deploy? true
- :slipset.deps-deploy/exec-args {:installer :remote
-                                 :sign-releases? false
-                                 :repository "clojars"}
-
- :deps
+{:deps
  {org.clojure/clojure {:mvn/version "1.12.0"}
   org.clojure/core.async {:mvn/version "1.8.741"}
   org.elasticsearch.client/elasticsearch-rest-client {:mvn/version "9.2.1"}
@@ -20,10 +13,12 @@
  {:test {:extra-paths ["test"]
          :extra-deps {eftest/eftest {:mvn/version "0.6.0"}
                       orchestra/orchestra {:mvn/version "2021.01.01-1"}}}
-  :project
-  {:extra-deps {io.github.exoscale/tools.project {:git/sha "4ad527fac7bdc24f649404205ca31754339f856d"}}
-   :ns-default exoscale.tools.project
-   :jvm-opts ["-Dclojure.main.report=stderr"]}
+
+  :build
+  {:deps {io.github.clojure/tools.build {:git/tag "v0.10.9" :git/sha "e405aac"}
+          io.github.slipset/deps-deploy {:git/sha "07022b92d768590ab25b9ceb619ef17d2922da9a"}}
+   :ns-default build}
+
   :quickdoc
   {:deps {org.babashka/cli {:mvn/version "0.4.36"}
           io.github.borkdude/quickdoc
