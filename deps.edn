@@ -1,7 +1,9 @@
 {:deps
  {org.clojure/clojure {:mvn/version "1.12.0"}
   org.clojure/core.async {:mvn/version "1.8.741"}
-  org.elasticsearch.client/elasticsearch-rest-client {:mvn/version "9.2.1"}
+  ;; org.elasticsearch.client/elasticsearch-rest-client {:mvn/version "9.2.1"}
+;; https://mvnrepository.com/artifact/co.elastic.clients/elasticsearch-rest5-client
+  co.elastic.clients/elasticsearch-rest5-client {:mvn/version "9.2.1"}
   org.elasticsearch.client/elasticsearch-rest-client-sniffer {:mvn/version "9.2.1"}
   cc.qbits/commons {:mvn/version "1.0.0-alpha6"}
   cheshire/cheshire {:mvn/version "6.1.0"}
