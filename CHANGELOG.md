@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.315
+
+* bump dependencies: 
+  - use es java client 9.2.1
+  - latest clojure/cheshire
+
 ## 0.7.1
 
 * Fix scroll-id larger than 4K causing `too_long_frame_exception` #45
